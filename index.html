@@ -1,0 +1,1677 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111a15">
+  <title>Lucky Clover Bingo</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #eee9d7;
+      --muted: #aaa995;
+      --paper: #111a15;
+      --panel: #1a251e;
+      --line: #39483d;
+      --green: #c8a85c;
+      --deep-green: #214b36;
+      --mint: #294a38;
+      --gold: #d8b65e;
+      --shadow: none;
+      --accent-bright: #e0c776;
+      --accent-soft: #343626;
+      --offset: #8a2935;
+      --offset-hover: #a13a45;
+      --offset-ink: #f8e8b9;
+      --panel-raised: #202d24;
+      --panel-hover: #29382d;
+      --brand-bg: var(--offset);
+      --brand-fg: var(--offset-ink);
+      --action: var(--offset);
+      --action-hover: var(--offset-hover);
+      --ball-bg: var(--offset);
+      --ball-fg: var(--offset-ink);
+      --card-frame: #173a2a;
+      --card-cell: #234632;
+      --card-cell-border: #3d5b47;
+      --card-cell-text: #eee9d7;
+      --marked-text: #171b14;
+      --free-bg: #d4b75e;
+      --free-text: #282315;
+      --free-border: #e0c776;
+      --progress-track: #17251c;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      text-transform: capitalize;
+    }
+
+    button { font: inherit; }
+    button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+
+    .shell { width: min(1160px, calc(100% - 40px)); margin: 0 auto; padding: 32px 0 56px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 36px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      display: grid; width: 44px; height: 44px; place-items: center;
+      border-radius: 14px; background: var(--deep-green); color: #f5d477; font-size: 25px;
+    }
+    .brand-name { font: 700 14px/1.1 Georgia, serif; letter-spacing: .04em; }
+    .brand-kicker { margin-top: 5px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+    .hall-badge { padding: 10px 14px; border: 1px solid var(--line); border-radius: 99px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+
+    .hero { margin-bottom: 26px; }
+    .eyebrow { margin: 0 0 10px; color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
+    h1 { margin: 0; font: 700 clamp(34px, 5vw, 56px)/1 Georgia, serif; letter-spacing: -.045em; }
+    .hero-copy { max-width: 570px; margin: 13px 0 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+    .dashboard { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, .8fr); align-items: start; gap: 20px; }
+    .left-column, .right-column { display: grid; gap: 20px; }
+    .panel { border: 1px solid var(--line); border-radius: 20px; background: var(--panel); box-shadow: var(--shadow); }
+    .game-panel { overflow: hidden; }
+    .game-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 21px 24px; border-bottom: 1px solid var(--line); }
+    .game-heading { margin: 0; font: 700 19px Georgia, serif; }
+    .game-title-row { display: flex; align-items: center; gap: 9px; }
+    .help-button {
+      display: grid; width: 23px; height: 23px; place-items: center; padding: 0;
+      border: 1px solid var(--line); border-radius: 50%; background: var(--panel-raised); color: var(--accent-bright);
+      cursor: pointer; font-size: 13px; font-weight: 800; line-height: 1;
+    }
+    .help-button:hover { background: var(--panel-hover); }
+    .bingo-help {
+      width: min(390px, calc(100vw - 32px)); padding: 20px;
+      border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--ink);
+    }
+    .bingo-help::backdrop { background: rgba(5, 10, 7, .72); }
+    .help-heading { margin: 0; font-size: 17px; }
+    .help-description { margin: 8px 0 14px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .payout-list { display: grid; gap: 7px; margin: 0 0 16px; padding: 0; list-style: none; }
+    .payout-list li { display: flex; justify-content: space-between; gap: 14px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel-raised); font-size: 11px; }
+    .payout-list strong { white-space: nowrap; color: var(--accent-bright); }
+    .help-close { min-height: 34px; padding: 0 14px; border: 1px solid var(--line); border-radius: 7px; background: var(--action); color: var(--ink); cursor: pointer; font-size: 11px; font-weight: 700; }
+    .game-subtitle { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+    .status { display: inline-flex; align-items: center; gap: 7px; color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #b9c3bb; }
+    .status.is-running .status-dot { background: #55a477; box-shadow: 0 0 0 4px rgba(85, 164, 119, .12); }
+
+    .draw-area { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 20px; padding: 22px 24px 14px; }
+    .called-ball {
+      display: grid; width: min(100%, 132px); aspect-ratio: 1; place-items: center; margin: 0 auto;
+      border: 7px solid var(--line); border-radius: 50%; background: var(--ball-bg); color: var(--ball-fg);
+      box-shadow: 0 0 0 1px var(--line), 0 8px 18px rgba(23, 56, 47, .13);
+      font: 700 clamp(30px, 5vw, 48px)/1 Georgia, serif; transition: transform .2s ease;
+    }
+    .caller-area { display: grid; justify-items: center; gap: 5px; min-width: 0; }
+    .roller-group { display: grid; grid-template-columns: repeat(var(--caller-count, 1), minmax(0, 1fr)); align-items: center; gap: 8px; width: min(100%, 360px); margin: 0 auto; }
+    .roller-group.has-five-callers { gap: clamp(10px, 2vw, 18px); width: min(100%, 520px); }
+    .caller-machine { display: grid; justify-items: center; gap: 3px; min-width: 0; }
+    .roller-stage { position: relative; display: grid; width: min(100%, 132px); aspect-ratio: 1; place-items: center; margin: 0 auto; }
+    .roller-cage { position: absolute; inset: 3%; border: 2px solid var(--accent-bright); border-radius: 50%; opacity: .75; pointer-events: none; }
+    .roller-cage::before, .roller-cage::after { position: absolute; inset: -1px 22%; border: 1px solid var(--accent-bright); border-radius: 50%; content: ""; }
+    .roller-cage::after { transform: rotate(60deg); }
+    .roller-stage.is-rolling .roller-cage { animation: cage-spin var(--roller-speed, 1100ms) linear infinite; }
+    .roller-stage.is-rolling .roller-cage::before { transform: rotate(-60deg); }
+    .roller-stage.is-rolling .roller-cage::after { transform: rotate(60deg); }
+    .roller-stage .called-ball { position: relative; z-index: 1; width: 76%; margin: 0; }
+    .caller-label { color: var(--muted); font-size: 8px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    @keyframes cage-spin { to { transform: rotate(360deg); } }
+    .called-ball.preview { animation: ball-preview .22s linear infinite; }
+    .called-ball.reveal { animation: ball-reveal .7s cubic-bezier(.2, .8, .25, 1); }
+    @keyframes ball-preview { to { transform: rotateY(360deg) scale(.88); } }
+    @keyframes ball-reveal {
+      0% { transform: translateY(-32px) rotateY(540deg) scale(.7); opacity: .35; }
+      65% { transform: translateY(5px) rotateY(0) scale(1.13); opacity: 1; }
+      100% { transform: translateY(0) scale(1); }
+    }
+    .card-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 340px); align-items: start; gap: 16px; width: min(100% - 48px, 520px); margin: 0 auto; padding: 10px 0 24px; }
+    .draw-info { min-width: 0; padding-top: 23px; }
+    .micro-label { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    .history { display: flex; flex-wrap: wrap; gap: 6px; min-height: 28px; }
+    .history-group { flex: 1 1 100%; }
+    .history-group > .micro-label { margin: 4px 0 5px; }
+    .history-chip { display: inline-grid; min-width: 30px; height: 28px; place-items: center; padding: 0 7px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); font-size: 10px; font-weight: 700; }
+    .history-chip.is-on-card { border-color: var(--green); background: var(--green); color: var(--marked-text); }
+    .history-chip.is-enchanted { position: relative; box-shadow: inset 0 0 0 2px var(--offset), 0 0 8px color-mix(in srgb, var(--offset), transparent 45%); }
+    .history-chip.is-enchanted::after { position: absolute; top: -3px; right: 1px; color: var(--offset); content: "✦"; font-size: 8px; line-height: 1; }
+    .card-board { min-width: 0; }
+
+    .bingo-label-group { display: grid; grid-template-columns: repeat(var(--grid-size, 5), minmax(0, 1fr)); gap: 4px; margin-bottom: 3px; padding: 0 6px; }
+    .bingo-label-group span { display: grid; height: 23px; place-items: center; color: var(--green); font: 700 13px "Segoe UI", Tahoma, sans-serif; }
+    .cards { display: grid; grid-template-columns: repeat(var(--card-columns, 1), minmax(0, 1fr)); gap: 12px; }
+    body[data-room="grand-ballroom"] .cards[data-count="3"] > .card-slot:nth-child(3) { grid-column: 1 / -1; width: calc((100% - 12px) / 2); justify-self: center; }
+    .bingo-card { display: grid; grid-template-columns: repeat(var(--grid-size, 5), minmax(0, 1fr)); gap: 7px; padding: 8px; border: 1px solid var(--line); border-radius: 14px; background: var(--card-frame); }
+    .bingo-card[data-size="7"] { gap: 4px; padding: 6px; }
+    .bingo-card[data-size="7"] .cell { border-radius: 5px; font-size: clamp(8px, 1vw, 11px); }
+    .cell {
+      position: relative; display: grid; aspect-ratio: 1; place-items: center; padding: 0; overflow: hidden;
+      border: 1px solid var(--card-cell-border); border-radius: 9px; background: var(--card-cell); color: var(--card-cell-text);
+      font-size: clamp(10px, 1.6vw, 15px); font-weight: 700; transition: transform .17s, background .17s, color .17s;
+    }
+    .cell.marked { border-color: var(--green); background: var(--green); color: var(--marked-text); animation: daub .2s ease-out; }
+    .cell.free { border-color: var(--free-border); background: var(--free-bg); color: var(--free-text); font-size: 9px; letter-spacing: .05em; }
+    .cell.wild-mark { box-shadow: inset 0 0 0 2px #e6be56; }
+    .cell.enchanted { box-shadow: inset 0 0 0 2px var(--offset), 0 0 8px color-mix(in srgb, var(--offset), transparent 45%); }
+    .cell.enchanted::after { position: absolute; top: 1px; right: 3px; color: var(--offset); content: "✦"; font-size: 9px; line-height: 1; }
+    body[data-room="grand-ballroom"] .cell.enchanted::after,
+    body[data-room="lucky-clover-palace"] .cell.enchanted::after { content: none; }
+    @keyframes daub { 50% { transform: scale(.9); } }
+    .card-caption { display: flex; justify-content: space-between; gap: 10px; margin: 9px 2px 0; color: var(--muted); font-size: 10px; }
+
+    .controls { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 0 24px 22px; }
+    .control-note { color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .primary-button { min-height: 44px; padding: 0 20px; border: 0; border-radius: 11px; background: var(--action); color: var(--ink); cursor: pointer; font-size: 12px; font-weight: 800; transition: background .15s, transform .15s; }
+    .primary-button:hover { transform: translateY(-1px); background: var(--action-hover); }
+    .primary-button:disabled { cursor: default; opacity: .7; transform: none; }
+
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .stat { padding: 16px 14px; border: 1px solid var(--line); border-radius: 15px; background: rgba(255, 253, 247, .72); }
+    .stat-label { color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .stat-value { margin-top: 8px; font: 700 22px Georgia, serif; }
+    .side-panel { padding: 21px; }
+    .side-title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 5px; }
+    .side-title { margin: 0; font: 700 18px Georgia, serif; }
+    .side-caption { margin: 0 0 16px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .upgrade-list { display: grid; gap: 9px; }
+    .upgrade {
+      display: grid; grid-template-columns: 37px minmax(0, 1fr) auto; align-items: center; gap: 10px;
+      width: 100%; padding: 11px; border: 1px solid var(--line); border-radius: 13px; background: #fffefa; color: var(--ink); text-align: left; cursor: pointer;
+      transition: border-color .15s, background .15s, transform .15s;
+    }
+    .upgrade:hover:not(:disabled) { transform: translateY(-1px); border-color: var(--green); background: var(--panel-hover); }
+    .upgrade:disabled { cursor: default; opacity: .55; }
+    .upgrade-icon { display: grid; width: 37px; height: 37px; place-items: center; border-radius: 11px; background: var(--panel-hover); font-size: 18px; }
+    .upgrade-name { display: block; font-size: 11px; font-weight: 800; }
+    .upgrade-desc { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; line-height: 1.4; }
+    .upgrade-cost { white-space: nowrap; font-size: 10px; font-weight: 800; }
+    .upgrade-cost small { display: block; margin-top: 3px; color: var(--muted); font-size: 8px; text-align: right; }
+    .ticket-icon {
+      position: relative; display: inline-grid; width: 25px; height: 17px; place-items: center;
+      margin-right: 3px; color: var(--paper); font-size: 10px; line-height: 1; vertical-align: -3px;
+    }
+    .ticket-icon::before {
+      position: absolute; inset: 1px; background: var(--accent-bright);
+      clip-path: polygon(0 0, 100% 0, 100% 30%, 91% 40%, 91% 60%, 100% 70%, 100% 100%, 0 100%, 0 70%, 9% 60%, 9% 40%, 0 30%);
+      content: "";
+    }
+    .ticket-icon::after {
+      position: absolute; top: 3px; bottom: 3px; left: 6px; border-left: 1px dashed var(--paper);
+      content: "";
+    }
+    .ticket-icon span { position: relative; z-index: 1; margin-left: 1px; }
+    .upgrade.owned { border-color: var(--line); background: var(--panel-raised); }
+
+    .milestone { padding: 18px; border-radius: 15px; background: var(--deep-green); color: var(--ink); }
+    .milestone-top { display: flex; justify-content: space-between; gap: 12px; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .milestone p { margin: 10px 0 12px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .progress-track { height: 7px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.17); }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: var(--green); transition: width .3s; }
+    .global-upgrades { padding: 16px; border: 1px solid var(--line); border-radius: 15px; background: var(--panel); }
+    .global-upgrade-list { display: grid; gap: 7px; margin-top: 10px; }
+    .global-upgrade { display: flex; flex-direction: column; padding: 9px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel-raised); }
+    .global-upgrade.is-unlocked { border-color: var(--green); }
+    .global-upgrade-top { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; font-weight: 800; }
+    .global-upgrade-status { color: var(--muted); font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .global-upgrade.is-unlocked .global-upgrade-status { color: var(--green); }
+    .global-upgrade-desc { margin: auto 0 0; padding-top: 6px; color: var(--muted); font-size: 10px; line-height: 1.35; }
+    .rooms-panel { padding: 14px; border: 1px solid var(--line); border-radius: 9px; background: #263b2e; color: var(--ink); }
+    body.is-gilded .panel,
+    body.is-gilded .stat,
+    body.is-gilded .rooms-panel,
+    body.is-gilded .global-upgrades,
+    body.is-gilded .room-scene,
+    body.is-gilded .bingo-card {
+      border-width: 2px;
+      border-color: color-mix(in srgb, var(--offset), var(--line) 30%);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--offset), transparent 55%), 0 0 16px color-mix(in srgb, var(--offset), transparent 78%);
+    }
+    body.is-gilded .upgrade,
+    body.is-gilded .room-option,
+    body.is-gilded .global-upgrade,
+    body.is-gilded .cell,
+    body.is-gilded .history-chip {
+      border-width: 2px;
+      border-color: color-mix(in srgb, var(--offset), var(--line) 35%);
+    }
+    body.is-gilded .called-ball { border-width: 5px; border-color: color-mix(in srgb, var(--offset), var(--line) 15%); }
+    body.is-gilded .game-head { border-bottom-width: 2px; border-bottom-color: color-mix(in srgb, var(--offset), var(--line) 25%); }
+    body.is-gilded .bingo-label-group span,
+    body.is-gilded .room-scene-icon { color: var(--offset); }
+    body.is-gilded .room-option[aria-pressed="true"],
+    body.is-gilded .global-upgrade.is-unlocked { background: color-mix(in srgb, var(--offset), var(--panel-raised) 85%); }
+    body.is-gilded .room-progress-fill,
+    body.is-gilded .progress-fill { background: var(--offset); }
+    .rooms-heading { margin: 0; font-size: 14px; }
+    .rooms-copy { margin: 5px 0 10px; color: var(--muted); font-size: 9px; line-height: 1.4; }
+    .room-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+    .room-option {
+      position: relative; min-width: 0; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px;
+      background: #202d24; color: var(--ink); cursor: pointer; text-align: left;
+    }
+    .room-option > span { position: relative; z-index: 1; }
+    .room-option:hover:not(:disabled) { border-color: var(--green); background: var(--panel-hover); }
+    .room-option:disabled { cursor: not-allowed; opacity: .52; }
+    .room-option[aria-pressed="true"] { border-color: var(--green); background: var(--accent-soft); box-shadow: inset 3px 0 var(--green); }
+    .room-option-name { display: block; font-size: 11px; font-weight: 800; line-height: 1.25; }
+    .room-option-status { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; line-height: 1.35; }
+    .room-progress { margin-top: 9px; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .room-progress-track { height: 5px; margin-top: 5px; border-radius: 3px; background: var(--progress-track); }
+    .room-progress-fill { width: 0; height: 100%; border-radius: inherit; background: var(--green); transition: width .3s; }
+    .toast { position: fixed; right: 22px; bottom: 22px; z-index: 2; max-width: calc(100vw - 44px); padding: 13px 18px; border-radius: 12px; background: var(--deep-green); color: #fff; box-shadow: var(--shadow); font-size: 12px; opacity: 0; pointer-events: none; transform: translateY(10px); transition: opacity .2s, transform .2s; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { background: var(--action); }
+    .bingo-card { position: relative; }
+    .bingo-multiplier-splash {
+      position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; color: var(--offset);
+      pointer-events: none; animation: card-multiplier-flash .55s cubic-bezier(.16, .8, .3, 1) both;
+    }
+    .bingo-multiplier-value {
+      position: relative; padding: .08em .12em; border-radius: .16em; background: color-mix(in srgb, var(--panel), transparent 12%);
+      font-size: clamp(34px, 5vw, 64px); font-weight: 900; line-height: 1; text-shadow: 0 2px 12px rgba(0, 0, 0, .7), 0 0 12px color-mix(in srgb, var(--offset), transparent 25%);
+    }
+    .bingo-multiplier-icon { position: absolute; color: var(--offset); font-size: .3em; text-shadow: 0 2px 8px rgba(0, 0, 0, .75); }
+    .bingo-multiplier-icon:first-child { top: -.5em; right: -.65em; }
+    .bingo-multiplier-icon:last-child { bottom: -.5em; left: -.65em; }
+    @keyframes card-multiplier-flash {
+      0% { opacity: 0; transform: scale(.45) rotate(-8deg); }
+      18% { opacity: 1; transform: scale(1.12) rotate(3deg); }
+      32% { transform: scale(1) rotate(0); }
+      78% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(.92); }
+    }
+    .footer-note { margin: 20px 0 0; color: var(--muted); font-size: 10px; text-align: center; }
+
+    .shell { position: relative; z-index: 1; width: min(1240px, calc(100% - 32px)); padding: 16px 0 12px; }
+    .topbar { margin-bottom: 16px; }
+    .brand-mark { width: 38px; height: 38px; border-radius: 10px; background: var(--deep-green); color: #d1c49d; font-size: 22px; }
+    .hall-badge { padding: 7px 10px; border-radius: 8px; font-size: 10px; }
+    .hero { margin-bottom: 14px; }
+    .eyebrow { margin-bottom: 6px; font-size: 10px; }
+    h1 { font-size: clamp(30px, 4vw, 42px); }
+    .hero-copy { max-width: 900px; margin-top: 8px; font-size: 12px; line-height: 1.4; }
+    .dashboard { gap: 14px; }
+    .left-column, .right-column { gap: 12px; }
+    .panel { border-radius: 12px; }
+    .game-head { padding: 13px 18px; }
+    .game-heading { font-size: 17px; }
+    .game-subtitle { margin-top: 4px; font-size: 10px; }
+    .status { font-size: 9px; }
+    .status-dot { width: 7px; height: 7px; background: #aeb5ad; }
+    .status.is-running .status-dot { background: #718b77; box-shadow: none; }
+    .draw-area { gap: 14px; padding: 12px 18px 8px; }
+    .roller-stage { width: min(100%, 92px); }
+    .roller-stage .called-ball { width: 76%; }
+    .called-ball { border: 4px solid #d3d6ce; background: var(--deep-green); color: #ded8c4; box-shadow: none; font-size: clamp(20px, 2.5vw, 26px); white-space: nowrap; }
+    .history { gap: 5px; min-height: 23px; }
+    .history-chip { min-width: 27px; height: 23px; padding: 0 6px; border-radius: 5px; font-size: 9px; }
+    .card-wrap { width: min(100% - 36px, 520px); gap: 12px; padding: 0 0 12px; }
+    .draw-info { padding-top: 18px; }
+    .bingo-label-group { gap: 4px; padding: 0 6px; }
+    .bingo-label-group span { height: 23px; font-size: 12px; }
+    .cards { max-width: min(100%, 340px); gap: 8px; margin-inline: auto; }
+    .cards[data-count="2"] { max-width: min(100%, 740px); }
+    .bingo-card { gap: 4px; padding: 5px; border-color: var(--line); border-radius: 8px; background: #daddd5; }
+    .cell { border-color: #cbd0c7; border-radius: 6px; background: #e9eae4; }
+    .cell.marked { border-color: var(--green); background: var(--green); color: #f0f1eb; }
+    .cell.free { border-color: #aca387; background: #d0c9ad; color: var(--deep-green); }
+    .cell.wild-mark { box-shadow: inset 0 0 0 2px #b4a578; }
+    .cell.enchanted { box-shadow: inset 0 0 0 2px var(--offset), 0 0 7px color-mix(in srgb, var(--offset), transparent 40%); }
+    .cell.enchanted::after { color: var(--offset); }
+    .card-caption { margin-top: 6px; font-size: 9px; }
+    .controls { padding: 0 18px 12px; }
+    .control-note { font-size: 10px; }
+    .primary-button { min-height: 38px; padding: 0 16px; border-radius: 7px; background: var(--deep-green); color: #f0f1eb; font-size: 11px; }
+    .primary-button:hover { background: #52675a; }
+    .stats { gap: 8px; }
+    .stat { padding: 10px 12px; border-radius: 9px; background: var(--panel); }
+    .stat-value { margin-top: 5px; font-size: 18px; }
+    .side-panel { padding: 16px; }
+    .side-title { font-size: 16px; }
+    .side-caption { margin-bottom: 10px; font-size: 10px; line-height: 1.4; }
+    .upgrade-list { gap: 6px; }
+    .upgrade { padding: 8px; border-radius: 8px; background: #e5e7e0; }
+    .upgrade:hover:not(:disabled) { border-color: #9da99e; background: #ebede6; }
+    .upgrade-icon { width: 30px; height: 30px; border-radius: 7px; background: #d4d9d1; font-size: 16px; filter: grayscale(1); }
+    .upgrade.owned { border-color: #aab6aa; background: #dce2d9; }
+    .milestone { padding: 14px; border: 1px solid var(--line); border-radius: 9px; background: #d5d9d1; color: var(--ink); }
+    .milestone p { margin: 8px 0 10px; color: var(--muted); font-size: 10px; line-height: 1.4; }
+    .progress-track { height: 6px; border-radius: 3px; background: #c0c6bc; }
+    .progress-fill { background: #8a997f; }
+    .toast { border-radius: 8px; background: var(--deep-green); }
+    .toast.error { background: #70554f; }
+    .footer-note { margin-top: 10px; font-size: 9px; }
+
+    body { background: var(--paper); font-family: "Segoe UI", Tahoma, sans-serif; }
+    .brand-name, h1, .game-heading, .bingo-label-group span, .stat-value, .side-title {
+      font-family: "Segoe UI", Tahoma, sans-serif;
+    }
+    .brand-mark { background: var(--brand-bg); color: var(--brand-fg); }
+    .brand-kicker, .hall-badge, .eyebrow, .status, .micro-label, .stat-label, .milestone-top {
+      text-transform: capitalize;
+    }
+    .hall-badge { border-color: var(--line); color: var(--accent-bright); }
+    .eyebrow, .bingo-label-group span { color: var(--green); }
+    .panel, .stat { border-color: var(--line); background: var(--panel); }
+    .game-head { border-color: var(--line); }
+    .status { color: var(--green); }
+    .status-dot { background: #77796c; }
+    .status.is-running .status-dot { background: #7db17c; }
+    .called-ball { border-color: var(--accent-bright); background: var(--ball-bg); color: var(--ball-fg); }
+    .history-chip { border-color: var(--line); background: var(--panel-raised); color: var(--muted); }
+    .bingo-card { border-color: var(--line); background: var(--card-frame); }
+    .cell { border-color: var(--card-cell-border); background: var(--card-cell); color: var(--card-cell-text); }
+    .cell.marked { border-color: var(--green); background: var(--green); color: var(--marked-text); }
+    .cell.free { border-color: var(--free-border); background: var(--free-bg); color: var(--free-text); }
+    .cell.wild-mark { box-shadow: inset 0 0 0 2px var(--accent-bright); }
+    .primary-button { background: var(--action); color: var(--ink); }
+    .primary-button:hover { background: var(--action-hover); }
+    .upgrade { border-color: var(--line); background: var(--panel-raised); }
+    .upgrade:hover:not(:disabled) { border-color: var(--green); background: var(--panel-hover); }
+    .upgrade-icon { background: var(--panel-hover); filter: none; }
+    .upgrade.owned { border-color: var(--line); background: var(--accent-soft); }
+    .upgrade-cost { color: var(--accent-bright); }
+    .milestone { border-color: var(--line); background: var(--deep-green); color: var(--ink); }
+    .milestone p { color: var(--muted); }
+    .progress-track { background: var(--progress-track); }
+    .progress-fill { background: var(--green); }
+    .toast { background: var(--deep-green); color: var(--ink); }
+    .toast.error { background: var(--action); }
+    .rooms-panel { padding: 12px; border-color: var(--line); background: var(--panel-raised); }
+
+    body[data-room="clover-corner"] {
+      --wallpaper-icon: "♣";
+      --ink: #eee9d7; --muted: #aaa995; --paper: #111a15; --panel: #1a251e; --line: #39483d; --green: #c8a85c; --deep-green: #214b36;
+      --accent-bright: #e0c776; --accent-soft: #343626; --panel-raised: #202d24; --panel-hover: #29382d;
+      --offset: #8a2935; --offset-hover: #a13a45; --offset-ink: #f8e8b9;
+      --brand-bg: var(--offset); --brand-fg: #f0d78d; --action: var(--offset); --action-hover: var(--offset-hover);
+      --ball-bg: var(--offset); --ball-fg: var(--offset-ink); --card-frame: #173a2a; --card-cell: #234632; --card-cell-border: #3d5b47;
+      --card-cell-text: #eee9d7; --marked-text: #171b14; --free-bg: #d4b75e; --free-text: #282315; --free-border: #e0c776; --progress-track: #17251c;
+    }
+    body[data-room="garden-room"] {
+      --wallpaper-icon: "❀";
+      --ink: #e7eedf; --muted: #aebba7; --paper: #102119; --panel: #1b2d22; --line: #3b5a43; --green: #9cbc72; --deep-green: #244b32;
+      --accent-bright: #c4d994; --accent-soft: #293c2b; --panel-raised: #213729; --panel-hover: #2d4732;
+      --offset: #a95c45; --offset-hover: #b96a52; --offset-ink: #fff0e4;
+      --brand-bg: var(--offset); --brand-fg: var(--offset-ink); --action: var(--offset); --action-hover: var(--offset-hover);
+      --ball-bg: var(--offset); --ball-fg: var(--offset-ink); --card-frame: #183b28; --card-cell: #244b33; --card-cell-border: #426b4a;
+      --card-cell-text: #e6eddd; --marked-text: #142318; --free-bg: #afc884; --free-text: #20351f; --free-border: #d0e0a1; --progress-track: #172b1e;
+    }
+    body[data-room="velvet-lounge"] {
+      --wallpaper-icon: "♠";
+      --ink: #f0e5df; --muted: #c2a9aa; --paper: #211317; --panel: #301b22; --line: #63404a; --green: #c9879c; --deep-green: #592935;
+      --accent-bright: #ecc0cd; --accent-soft: #48252d; --panel-raised: #3a2029; --panel-hover: #4b2933;
+      --offset: #477c78; --offset-hover: #588d88; --offset-ink: #f5ece4;
+      --brand-bg: var(--offset); --brand-fg: var(--offset-ink); --action: var(--offset); --action-hover: var(--offset-hover);
+      --ball-bg: var(--offset); --ball-fg: var(--offset-ink); --card-frame: #351b25; --card-cell: #48232e; --card-cell-border: #704351;
+      --card-cell-text: #f0e5df; --marked-text: #2a1718; --free-bg: #b9788d; --free-text: #321b1c; --free-border: #e7b0c0; --progress-track: #26161b;
+    }
+    body[data-room="starlight-salon"] {
+      --wallpaper-icon: "✦";
+      --ink: #e8edf8; --muted: #a9b5ca; --paper: #111625; --panel: #1b2437; --line: #3b4b6a; --green: #92a9d6; --deep-green: #2b3e67;
+      --accent-bright: #c4d3f5; --accent-soft: #283553; --panel-raised: #202c43; --panel-hover: #2a3b58;
+      --offset: #b4934f; --offset-hover: #c5a75f; --offset-ink: #241d10;
+      --brand-bg: var(--offset); --brand-fg: var(--offset-ink); --action: var(--offset); --action-hover: var(--offset-hover);
+      --ball-bg: var(--offset); --ball-fg: var(--offset-ink); --card-frame: #18253d; --card-cell: #233652; --card-cell-border: #405779;
+      --card-cell-text: #e8edf8; --marked-text: #172137; --free-bg: #829cc8; --free-text: #152039; --free-border: #bdcdef; --progress-track: #151e32;
+    }
+    body[data-room="grand-ballroom"] {
+      --wallpaper-icon: "♫";
+      --ink: #eee7f2; --muted: #b6a9bd; --paper: #1c1520; --panel: #2a2030; --line: #51415c; --green: #c2a0d4; --deep-green: #49345b;
+      --accent-bright: #dfc4ec; --accent-soft: #3c2c48; --panel-raised: #33273d; --panel-hover: #443350;
+      --offset: #537c79; --offset-hover: #668e8a; --offset-ink: #f4eaf4;
+      --brand-bg: var(--offset); --brand-fg: var(--offset-ink); --action: var(--offset); --action-hover: var(--offset-hover);
+      --ball-bg: var(--offset); --ball-fg: var(--offset-ink); --card-frame: #2b2035; --card-cell: #3c2c48; --card-cell-border: #604a6f;
+      --card-cell-text: #eee7f2; --marked-text: #24182d; --free-bg: #b58fc8; --free-text: #281a31; --free-border: #dcc2e9; --progress-track: #211a29;
+    }
+    body[data-room="lucky-clover-palace"] {
+      --wallpaper-icon: "♛";
+      --ink: #f2ead6; --muted: #c4b78f; --paper: #201a0d; --panel: #302716; --line: #655332; --green: #e5c46e; --deep-green: #665126;
+      --accent-bright: #f2dc9a; --accent-soft: #47391d; --panel-raised: #3a2e19; --panel-hover: #4d3d20;
+      --offset: #684b83; --offset-hover: #7b5b96; --offset-ink: #fff0d6;
+      --brand-bg: var(--offset); --brand-fg: #f8e5a5; --action: var(--offset); --action-hover: var(--offset-hover);
+      --ball-bg: var(--offset); --ball-fg: var(--offset-ink); --card-frame: #302612; --card-cell: #473819; --card-cell-border: #725a2b;
+      --card-cell-text: #f2ead6; --marked-text: #2b210f; --free-bg: #d5b451; --free-text: #2e240f; --free-border: #f0d77e; --progress-track: #261e0e;
+    }
+    .room-wallpaper { position: fixed; z-index: 0; inset: 0; overflow: hidden; pointer-events: none; }
+    .room-wallpaper::before {
+      position: absolute; inset: 0; background: repeating-linear-gradient(135deg, transparent 0 34px, color-mix(in srgb, var(--green), transparent 96%) 35px 36px);
+      content: "";
+    }
+    .room-wallpaper-mark {
+      position: absolute; color: var(--green); font: 700 clamp(52px, 9vw, 112px)/1 Georgia, serif; opacity: .1;
+      user-select: none;
+    }
+    .room-wallpaper-mark::before { content: var(--wallpaper-icon, "♣"); }
+    .room-wallpaper-mark:nth-child(1) { top: 8%; left: 77%; transform: rotate(-14deg); }
+    .room-wallpaper-mark:nth-child(2) { top: 10%; right: 12%; transform: rotate(12deg); }
+    .room-wallpaper-mark:nth-child(3) { bottom: 17%; left: 23%; transform: rotate(9deg); }
+    .room-wallpaper-mark:nth-child(4) { right: 28%; bottom: 7%; transform: rotate(-11deg); }
+    .main-menu {
+      position: fixed; z-index: 5; inset: 0; display: grid; place-items: center; padding: 24px;
+      background: radial-gradient(ellipse at 50% 42%, var(--panel-raised), var(--paper) 72%);
+    }
+    .main-menu[hidden] { display: none; }
+    .menu-card { width: min(100%, 540px); padding: clamp(28px, 6vw, 54px); border: 1px solid var(--line); border-radius: 22px; background: var(--panel); text-align: center; box-shadow: 0 20px 70px rgba(0, 0, 0, .3); }
+    .menu-mark { display: grid; width: 76px; height: 76px; place-items: center; margin: 0 auto 22px; border: 1px solid var(--accent-bright); border-radius: 24px; background: var(--brand-bg); color: var(--brand-fg); font-size: 42px; }
+    .menu-kicker { margin: 0 0 10px; color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
+    .menu-title { margin: 0; font: 700 clamp(38px, 8vw, 62px)/1 Georgia, serif; letter-spacing: -.045em; }
+    .menu-copy { max-width: 350px; margin: 16px auto 26px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .menu-start { min-height: 48px; min-width: 180px; padding: 0 24px; border: 0; border-radius: 11px; background: var(--action); color: var(--ink); cursor: pointer; font-size: 13px; font-weight: 800; transition: background .15s, transform .15s; }
+    .menu-start:hover { transform: translateY(-2px); background: var(--action-hover); }
+    .menu-start:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+    .menu-note { margin: 17px 0 0; color: var(--muted); font-size: 10px; }
+    .room-scene {
+      position: relative; display: flex; min-height: 58px; align-items: center; gap: 8px; margin: 10px 0;
+      padding: 6px 8px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px;
+      background: var(--scene-bg, linear-gradient(115deg, #344638, #202d24)); isolation: isolate;
+    }
+    .room-scene-icon {
+      display: grid; width: 36px; height: 36px; flex: 0 0 36px; place-items: center;
+      border: 1px solid color-mix(in srgb, var(--green), transparent 45%); border-radius: 50%;
+      background: color-mix(in srgb, var(--panel), transparent 18%); color: var(--green); font-size: 20px;
+    }
+    .room-scene-copy { min-width: 0; flex: 1; }
+    .room-scene-name { display: block; overflow: hidden; font: 700 13px Georgia, serif; text-overflow: ellipsis; white-space: nowrap; }
+    .room-scene-mood { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; line-height: 1.3; }
+    body[data-room="clover-corner"] { --scene-bg: radial-gradient(ellipse at 90% 10%, #526b42, transparent 55%), linear-gradient(115deg, #344638, #202d24); --scene-motif: "♣"; }
+    body[data-room="garden-room"] { --scene-bg: radial-gradient(circle at 85% 25%, #577443 0 2px, transparent 3px), radial-gradient(ellipse at 100% 0, #395d3a, transparent 60%), linear-gradient(115deg, #294532, #1d3024); --scene-motif: "❀"; }
+    body[data-room="velvet-lounge"] { --scene-bg: repeating-linear-gradient(110deg, transparent 0 18px, rgba(218, 159, 125, .05) 19px 20px), linear-gradient(115deg, #532936, #301b22); --scene-motif: "♠"; }
+    body[data-room="starlight-salon"] { --scene-bg: radial-gradient(circle at 78% 27%, #d4dcff 0 1px, transparent 2px), radial-gradient(circle at 90% 75%, #9cafd8 0 1px, transparent 2px), linear-gradient(115deg, #26395d, #1b2437); --scene-motif: "✦"; }
+    body[data-room="grand-ballroom"] { --scene-bg: repeating-linear-gradient(90deg, transparent 0 23px, rgba(218, 190, 229, .05) 24px 25px), linear-gradient(115deg, #4b3556, #2a2030); --scene-motif: "♫"; }
+    body[data-room="lucky-clover-palace"] { --scene-bg: radial-gradient(ellipse at 90% 0, #776033, transparent 60%), linear-gradient(115deg, #57451f, #302716); --scene-motif: "♛"; }
+    .room-option { display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: center; gap: 6px; }
+    .room-option-icon { color: var(--green); font-size: 14px; text-align: center; }
+    .room-option[aria-pressed="true"] .room-option-icon { color: var(--accent-bright); }
+
+    .card-slot { position: relative; min-width: 0; }
+    .cell.winning-line { position: relative; z-index: 1; animation: winning-line-glow .55s ease-in-out 2 alternate; }
+    @keyframes winning-line-glow {
+      to { box-shadow: inset 0 0 0 3px #fff1b1, 0 0 15px rgba(255, 225, 139, .85); }
+    }
+    .card-slot.card-winner .bingo-card { animation: winner-leave .58s ease-in both; }
+    @keyframes winner-leave {
+      0% { opacity: 1; transform: scale(1); }
+      22% { opacity: 1; transform: scale(1.035); }
+      100% { opacity: 0; transform: scale(.9); }
+    }
+    .card-slot.card-enter .bingo-card { animation: card-arrive .34s ease-out both; }
+    @keyframes card-arrive {
+      from { opacity: 0; transform: scale(.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .confetti-burst { position: absolute; inset: 0; z-index: 2; overflow: visible; pointer-events: none; }
+    .confetti-piece {
+      position: absolute; top: 42%; left: 50%; width: 8px; height: 12px; border-radius: 2px;
+      background: var(--confetti-color); opacity: 0;
+      animation: confetti-pop .72s cubic-bezier(.15,.75,.35,1) var(--confetti-delay) both;
+    }
+    @keyframes confetti-pop {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(.25) rotate(0); }
+      12% { opacity: 1; }
+      100% { opacity: 0; transform: translate(calc(-50% + var(--confetti-x)), calc(-50% + var(--confetti-y))) rotate(var(--confetti-rotation)) scale(.75); }
+    }
+
+    @media (min-width: 781px) and (min-height: 700px) {
+      .shell { padding-top: 10px; padding-bottom: 6px; }
+      .topbar { margin-bottom: 10px; }
+      .hero { margin-bottom: 10px; }
+      .side-panel { padding: 14px; }
+      .upgrade-list { gap: 5px; }
+      .upgrade { padding-top: 6px; padding-bottom: 6px; }
+    }
+
+    @media (min-width: 1200px) and (min-height: 700px) {
+      .dashboard { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: stretch; }
+      .left-column { grid-template-rows: minmax(0, 1fr) auto; }
+      .right-column { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto minmax(0, 1fr); align-items: stretch; gap: 8px; }
+      .right-column > .side-panel { grid-column: 1 / -1; }
+      .global-upgrades, .rooms-panel { min-width: 0; padding: 12px; }
+      .global-upgrades { display: grid; grid-template-rows: auto auto minmax(0, 1fr); }
+      .global-upgrade-list { min-height: 0; grid-template-rows: repeat(3, minmax(0, 1fr)); }
+      .rooms-panel { display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto auto; }
+      .rooms-panel .room-list { min-height: 0; grid-template-rows: repeat(3, minmax(0, 1fr)); }
+      .rooms-panel .room-option { align-content: center; }
+      body[data-room="grand-ballroom"] .card-wrap { grid-template-columns: minmax(140px, .6fr) minmax(0, 1.4fr); width: calc(100% - 36px); }
+      body[data-room="grand-ballroom"] .cards[data-count="3"] { width: 100%; max-width: none; margin-inline: 0; }
+      body[data-room="grand-ballroom"] .bingo-card { aspect-ratio: 1.25; grid-template-rows: repeat(var(--grid-size), minmax(0, 1fr)); }
+      body[data-room="grand-ballroom"] .bingo-card .cell { min-height: 0; aspect-ratio: auto; }
+      body[data-room="starlight-salon"] .game-panel:not(.has-four-cards) { display: flex; flex-direction: column; }
+      body[data-room="starlight-salon"] .card-wrap { grid-template-columns: minmax(140px, .6fr) minmax(0, 1.4fr); width: calc(100% - 24px); }
+      body[data-room="starlight-salon"] .card-wrap:not(.has-four-cards) { flex: 1; min-height: 0; align-items: stretch; }
+      body[data-room="starlight-salon"] .card-board { display: flex; flex-direction: column; justify-content: center; }
+      body[data-room="starlight-salon"] .cards[data-count="2"] { grid-template-columns: repeat(2, 213px); gap: 20px; align-self: center; max-width: min(100%, 446px); margin-inline: auto; }
+      .card-wrap.has-four-cards { grid-template-columns: minmax(150px, .6fr) minmax(0, 1.4fr); width: calc(100% - 36px); }
+      .game-panel.has-four-cards { display: flex; flex-direction: column; }
+      .card-wrap.has-four-cards { flex: 1; min-height: 0; align-items: stretch; }
+      .card-wrap.has-four-cards .card-board,
+      .card-wrap.has-four-cards .cards,
+      .card-wrap.has-four-cards .card-slot { display: flex; flex-direction: column; min-height: 0; }
+      .card-wrap.has-four-cards .cards { flex: 1; display: grid; grid-template-rows: repeat(2, minmax(0, 1fr)); }
+      .card-wrap.has-four-cards .card-slot { min-width: 0; }
+      .card-wrap.has-four-cards .cards { max-width: none; margin-inline: 0; }
+      .card-wrap.has-four-cards .bingo-card { flex: 1; min-height: 0; grid-template-rows: repeat(var(--grid-size), minmax(0, 1fr)); }
+      .card-wrap.has-four-cards .cell { min-height: 0; aspect-ratio: auto; }
+      body[data-room="lucky-clover-palace"] .card-wrap.has-four-cards .bingo-label-group,
+      body[data-room="lucky-clover-palace"] .card-wrap.has-four-cards .bingo-card { width: 97%; align-self: center; }
+      body[data-room="lucky-clover-palace"] .card-wrap.has-four-cards .bingo-card { flex: 0 0 90%; }
+      .game-panel.has-four-cards .draw-area { padding-top: 3px; padding-bottom: 0; }
+      .game-panel.has-four-cards .roller-stage { width: min(100%, 68px); }
+      .card-wrap.has-four-cards .bingo-label-group { margin-bottom: 1px; }
+      .card-wrap.has-four-cards .bingo-label-group span { height: 18px; }
+      .card-wrap.has-four-cards .cards { gap: 5px; }
+      .card-wrap.has-four-cards { padding-bottom: 0; }
+      .global-upgrades .rooms-copy { margin-bottom: 9px; }
+      .global-upgrade-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-top: 9px; }
+      .global-upgrade { min-width: 0; padding: 9px; }
+      .global-upgrade-top { flex-wrap: wrap; gap: 2px 6px; }
+      .global-upgrade-desc { margin-top: 5px; }
+      .rooms-panel .room-scene { min-height: 44px; margin: 7px 0; padding: 5px 7px; }
+      .rooms-panel .room-scene-icon { width: 30px; height: 30px; flex-basis: 30px; font-size: 17px; }
+      .rooms-panel .rooms-copy { margin-bottom: 7px; }
+      .rooms-panel .room-list { gap: 5px; }
+      .rooms-panel .room-option { padding: 8px; }
+      .rooms-panel .room-option-name { font-size: 11px; }
+      .rooms-panel .room-option-status { margin-top: 4px; font-size: 9px; line-height: 1.3; }
+      .rooms-panel .room-progress { margin-top: 7px; font-size: 11px; line-height: 1.4; }
+    }
+
+    @media (min-width: 781px) and (min-height: 700px) {
+      .cards[data-count="1"] { max-width: min(340px, calc(100vh - 520px)); }
+      .cards[data-count="2"] { max-width: min(680px, calc((100vh - 520px) * 2)); }
+    }
+
+    @media (min-width: 781px) and (min-height: 700px) and (max-height: 900px) {
+      .shell { padding-top: 10px; padding-bottom: 5px; }
+      .topbar { margin-bottom: 10px; }
+      .hero { margin-bottom: 8px; }
+      .cards[data-count="1"] { max-width: min(340px, calc(100vh - 530px)); }
+      .cards[data-count="2"] { max-width: min(680px, calc((100vh - 530px) * 2)); }
+      .game-head { padding-top: 10px; padding-bottom: 10px; }
+      .draw-area { padding-top: 8px; padding-bottom: 5px; }
+      .card-wrap { padding-bottom: 8px; }
+      .controls { padding-bottom: 8px; }
+      .left-column, .right-column { gap: 8px; }
+      .side-panel { padding: 12px; }
+      .upgrade-list { gap: 4px; }
+      .side-panel .upgrade-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .upgrade { padding: 6px; }
+      .milestone { padding: 10px; }
+      .rooms-panel { padding: 10px; }
+      .room-list { gap: 4px; }
+      .rooms-panel .room-list { gap: 4px; }
+      .rooms-panel .room-option { padding: 6px; }
+      .rooms-panel .room-option-name { font-size: 10px; }
+      .rooms-panel .room-option-status { margin-top: 3px; font-size: 8.5px; line-height: 1.2; }
+      .rooms-panel .room-list { grid-template-rows: repeat(3, auto); align-content: start; }
+      .rooms-panel .room-scene { min-height: 38px; margin: 5px 0; padding: 4px 6px; }
+      .rooms-panel .room-scene-icon { width: 26px; height: 26px; flex-basis: 26px; font-size: 15px; }
+      .global-upgrades { padding: 8px; }
+      .global-upgrades .rooms-copy { margin-bottom: 5px; }
+      .global-upgrade-list { gap: 4px; margin-top: 5px; }
+      .global-upgrade { padding: 5px; }
+      .global-upgrade-top { font-size: 11px; }
+      .global-upgrade-status { font-size: 10px; }
+      .global-upgrade-desc { padding-top: 6px; font-size: 10px; line-height: 1.3; }
+      .stat { padding: 8px 10px; }
+      .footer-note { margin-top: 6px; }
+    }
+
+    @media (min-width: 1200px) and (min-height: 700px) and (max-height: 739px) {
+      .shell { padding-bottom: 0; }
+      .topbar { margin-bottom: 8px; }
+      .hero { margin-bottom: 7px; }
+      .hero-copy { font-size: 11px; line-height: 1.3; }
+      .global-upgrades { padding: 8px; }
+      .global-upgrade-list { gap: 3px; margin-top: 3px; }
+      .global-upgrade { padding: 3px; }
+      .global-upgrade-top { font-size: 10px; }
+      .global-upgrade-status { font-size: 9px; }
+      .global-upgrade-desc { padding-top: 4px; font-size: 9px; line-height: 1.2; }
+      .rooms-panel { padding: 8px; }
+      .rooms-panel .room-scene { min-height: 34px; margin: 4px 0; padding: 3px 5px; }
+      .rooms-panel .room-scene-icon { width: 24px; height: 24px; flex-basis: 24px; font-size: 14px; }
+      .rooms-panel .rooms-copy { margin-bottom: 4px; }
+      .rooms-panel .room-list { gap: 3px; }
+      .rooms-panel .room-option { padding: 5px; }
+      .rooms-panel .room-option-name { font-size: 10px; }
+      .rooms-panel .room-option-status { font-size: 8.5px; line-height: 1.15; }
+      .rooms-panel .room-progress { margin-top: 5px; font-size: 10px; line-height: 1.25; }
+      .footer-note { margin-top: 3px; }
+    }
+
+    @media (max-width: 780px) {
+      .dashboard { grid-template-columns: 1fr; }
+      .right-column { grid-template-columns: 1fr 1fr; align-items: start; }
+      .stats { grid-column: 1 / -1; }
+      .card-wrap { grid-template-columns: 1fr; width: min(100% - 36px, 520px); }
+      .draw-info { padding-top: 0; }
+      .cards { max-width: min(100%, 340px); margin-inline: auto; }
+      .cards[data-count="2"] { max-width: min(100%, 100%); }
+    }
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 24px, 480px); padding-top: 20px; }
+      .topbar { margin-bottom: 26px; }
+      .hero-copy { font-size: 13px; }
+      .game-head { padding: 17px; }
+      .draw-area { gap: 15px; padding: 18px 15px 12px; }
+      .roller-stage { width: min(100%, 94px); }
+      .called-ball { border-width: 5px; }
+      .card-wrap { width: min(100% - 22px, 520px); padding: 8px 0 19px; }
+      .bingo-card { gap: 4px; padding: 5px; }
+      .cell { border-radius: 6px; }
+      .controls { align-items: flex-start; padding: 0 15px 18px; }
+      .control-note { max-width: 170px; }
+      .primary-button { padding: 0 14px; }
+      .right-column { grid-template-columns: 1fr; }
+      .stats { grid-column: auto; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .upgrade { gap: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+      .roller-stage.is-rolling .roller-cage { animation: none; }
+      .cell.winning-line, .card-slot.card-winner .bingo-card, .card-slot.card-enter .bingo-card { animation: none; }
+      .confetti-burst { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="room-wallpaper" aria-hidden="true"><span class="room-wallpaper-mark"></span><span class="room-wallpaper-mark"></span><span class="room-wallpaper-mark"></span><span class="room-wallpaper-mark"></span></div>
+  <section class="main-menu" id="main-menu" aria-labelledby="menu-title">
+    <div class="menu-card">
+      <div class="menu-mark" aria-hidden="true">♣</div>
+      <p class="menu-kicker">Welcome To The Neighborhood</p>
+      <h1 class="menu-title" id="menu-title">Lucky Clover Bingo</h1>
+      <p class="menu-copy">Settle in, roll the bingo balls, and build your own lucky little hall.</p>
+      <button class="menu-start" id="start-game" type="button">Start Game <span aria-hidden="true">→</span></button>
+      <p class="menu-note">Your saved progress will be ready when you enter.</p>
+    </div>
+  </section>
+  <main class="shell" id="game" inert>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">♣</div>
+        <div><div class="brand-name">Lucky Clover</div><div class="brand-kicker">Neighborhood Bingo</div></div>
+      </div>
+      <div class="hall-badge" id="current-room">Clover Corner</div>
+    </header>
+
+    <section class="hero">
+      <p class="eyebrow">Your cozy corner of the world</p>
+      <h1 tabindex="-1">Lucky Clover Bingo</h1>
+      <p class="hero-copy">Settle in, let the numbers roll, and turn a little bingo room into the happiest hall in town. There are no bad rounds here.</p>
+    </section>
+
+    <div class="dashboard">
+      <div class="left-column">
+        <section class="panel game-panel" aria-label="Bingo game">
+          <div class="game-head">
+            <div>
+              <div class="game-title-row">
+                <h2 class="game-heading">Tonight's lucky card</h2>
+                <button class="help-button" id="help-button" type="button" aria-label="Show bingo ticket payouts" aria-haspopup="dialog" aria-controls="bingo-help">?</button>
+              </div>
+              <p class="game-subtitle">Every number brings you closer to a little win.</p>
+            </div>
+            <div class="status" id="game-status"><span class="status-dot"></span><span id="status-text">Ready when you are</span></div>
+          </div>
+          <dialog class="bingo-help" id="bingo-help" aria-labelledby="help-heading">
+            <h2 class="help-heading" id="help-heading">Bingo Ticket Payouts</h2>
+            <p class="help-description">Each completed line earns the displayed room payout. Room multipliers apply to line rewards, including line-upgrade bonuses. Bingos completed together multiply each other's rewards.</p>
+            <ul class="payout-list">
+              <li><span>Horizontal Row</span><strong id="row-payout">5 Clover Tickets</strong></li>
+              <li><span>Vertical Column</span><strong id="column-payout">5 Clover Tickets</strong></li>
+              <li><span>Diagonal</span><strong id="diagonal-payout">5 Clover Tickets</strong></li>
+            </ul>
+            <form method="dialog"><button class="help-close" type="submit">Got It</button></form>
+          </dialog>
+          <div class="draw-area">
+            <div class="caller-area" id="caller-area">
+              <div class="roller-group" id="roller-group" role="group" aria-label="Bingo number callers"></div>
+            </div>
+          </div>
+          <div class="card-wrap">
+            <div class="draw-info">
+              <div class="micro-label" id="latest-number-label">Latest · Card 1</div>
+              <div class="micro-label" style="margin:7px 0">Recent calls by card</div>
+              <div class="history" id="history" aria-label="Recent called numbers by card"></div>
+            </div>
+            <div class="card-board">
+              <div class="cards" id="cards" aria-live="polite"></div>
+            </div>
+          </div>
+          <div class="controls">
+            <div class="control-note" id="game-hint">Your first line is just around the corner.</div>
+            <button class="primary-button" id="toggle-button" type="button">Start calling <span aria-hidden="true"> →</span></button>
+          </div>
+        </section>
+        <section class="stats" aria-label="Hall statistics">
+          <div class="stat"><div class="stat-label" id="ticket-label">Clover Tickets</div><div class="stat-value" id="ticket-count">0</div></div>
+          <div class="stat"><div class="stat-label">Lifetime tickets · all rooms</div><div class="stat-value" id="lifetime-count">0</div></div>
+          <div class="stat"><div class="stat-label" id="room-lifetime-label">Room lifetime tickets</div><div class="stat-value" id="room-lifetime-count">0</div></div>
+          <div class="stat"><div class="stat-label">Bingos won here</div><div class="stat-value" id="lines-count">0</div></div>
+        </section>
+      </div>
+
+      <aside class="right-column">
+        <section class="panel side-panel">
+          <div class="side-title-row"><h2 class="side-title" id="upgrade-heading">Clover Corner Upgrades</h2></div>
+          <p class="side-caption" id="upgrade-caption">Choose upgrades that belong to this room.</p>
+          <div class="upgrade-list" id="upgrade-list"></div>
+        </section>
+        <section class="global-upgrades" aria-label="Game-wide bingo upgrades">
+          <h2 class="rooms-heading">Hall-Wide Rewards</h2>
+          <p class="rooms-copy">Earn permanent bonuses by winning bingos in any room.</p>
+          <div class="global-upgrade-list" id="global-upgrade-list"></div>
+        </section>
+        <section class="rooms-panel" aria-label="Bingo room progression">
+          <h2 class="rooms-heading">Your Bingo Rooms</h2>
+          <p class="rooms-copy">Unlock New Rooms As You Play, Then Move Between Them Anytime.</p>
+          <div class="room-scene" aria-live="polite">
+            <span class="room-scene-icon" id="room-scene-icon" aria-hidden="true">♣</span>
+            <span class="room-scene-copy"><strong class="room-scene-name" id="room-scene-name">Clover Corner</strong><span class="room-scene-mood" id="room-scene-mood">Your cozy starting room.</span></span>
+          </div>
+          <div class="room-list" id="room-list"></div>
+          <div class="room-progress" id="room-progress"></div>
+          <div class="room-progress-track" aria-hidden="true"><div class="room-progress-fill" id="room-progress-fill"></div></div>
+        </section>
+      </aside>
+    </div>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const STORAGE_KEY = 'lucky-clover-bingo-v1';
+    const MAX_NUMBER = 99;
+    const BASE_DRAW_DURATION = 2500;
+    const AUTO_CALL_PAUSE = 1000;
+    const CARD_RANGES = [[1, 19], [20, 39], [40, 59], [60, 79], [80, 99]];
+    const UPGRADES = [
+      { id: 'quick', roomId: 'clover-corner', icon: '⏱', name: 'Quick Caller', description: 'Shortens the time between number draws in this room.', baseCost: 6, max: 5 },
+      { id: 'bonus', roomId: 'clover-corner', icon: '🍀', name: 'Lucky Dauber', description: 'Adds 2 base tickets to each completed line, before the room multiplier.', baseCost: 10, max: 5 },
+      { id: 'cardLuck', roomId: 'clover-corner', icon: '🎯', name: 'Card Compass', description: 'Increases the chance a draw selects a number still on your card.', baseCost: 15, max: 5 },
+      { id: 'wild', roomId: 'garden-room', icon: '✨', name: 'Wishful Thinking', description: 'Called squares can be enchanted for bonus tickets; chance and bonus grow with each level.', baseCost: 15, max: 10 },
+      { id: 'multi', roomId: 'velvet-lounge', icon: '↗', name: 'Double Draw', description: 'Calls extra numbers for every card on each draw.', baseCost: 18, max: 3 }
+    ];
+    const GLOBAL_UPGRADES = [
+      { id: 'autoCaller', roomId: 'clover-corner', bingos: 35, name: 'Auto Caller', description: 'Automatically repeats number draws in every room.' },
+      { id: 'ticketBonus', roomId: 'garden-room', bingos: 50, name: 'Lucky Streak', description: 'Adds 1 base ticket to each completed line, before the room multiplier.' },
+      { id: 'cardLuck', roomId: 'velvet-lounge', bingos: 100, name: 'Keen Eye', description: 'Adds 10 percentage points to card-number draw chance, up to 75%.' },
+      { id: 'quickCaller', roomId: 'starlight-salon', bingos: 150, name: 'Quick Draw', description: 'Reduces the time per number draw by 250 ms in every room.' },
+      { id: 'doubleDraw', roomId: 'grand-ballroom', bingos: 200, name: 'Double Time', description: 'Calls 1 extra number for every card on each draw.' },
+      { id: 'cloverFavor', roomId: 'lucky-clover-palace', bingos: 250, name: 'Clover’s Favor', description: 'New Palace cards start with 1 random square marked, but not called.' }
+    ];
+    const ROOM_FEATURES = {
+      'starlight-salon': [{ id: 'secondCard', icon: '✦', name: 'Starlight Pair', description: 'Adds a second 5×5 card to each draw.', cost: 60 }],
+      'grand-ballroom': [{ id: 'thirdCard', icon: '♫', name: 'Triple Play', description: 'Adds a second and third 5×5 card to each draw.', cost: 130 }],
+      'lucky-clover-palace': [{ id: 'palaceCards', icon: '♛', name: 'Royal Spread', description: 'Unlocks four 7×7 cards for each draw.', cost: 300 }]
+    };
+    const ROOMS = [
+      { id: 'clover-corner', name: 'Clover Corner', ticketName: 'Clover', icon: '♣', description: 'Your cozy starting room.', requirement: null },
+      { id: 'garden-room', name: 'Garden Room', ticketName: 'Garden', icon: '❀', description: 'Earn 50 tickets in Clover Corner.', requirement: { type: 'tickets', value: 50 } },
+      { id: 'velvet-lounge', name: 'The Velvet Lounge', ticketName: 'Velvet', icon: '♠', description: 'Win 10 bingos in the Garden Room.', requirement: { type: 'bingos', value: 10 } },
+      { id: 'starlight-salon', name: 'Starlight Salon', ticketName: 'Starlight', icon: '✦', description: 'Earn 250 tickets in The Velvet Lounge.', requirement: { type: 'tickets', value: 250 } },
+      { id: 'grand-ballroom', name: 'The Grand Ballroom', ticketName: 'Ballroom', icon: '♫', description: 'Win 50 bingos in Starlight Salon.', requirement: { type: 'bingos', value: 50 } },
+      { id: 'lucky-clover-palace', name: 'Lucky Clover Palace', ticketName: 'Palace', icon: '♛', description: 'Earn 1,000 tickets in The Grand Ballroom.', requirement: { type: 'tickets', value: 1000 } }
+    ];
+    const freshState = () => ({
+      roomTickets: Object.fromEntries(ROOMS.map((room) => [room.id, 0])), lifetime: 0, lines: 0, running: false,
+      roomProgress: Object.fromEntries(ROOMS.map((room) => [room.id, { tickets: 0, bingos: 0 }])),
+      roomUpgrades: Object.fromEntries(ROOMS.map((room) => [room.id, {}])),
+      roomFeatures: { secondCard: false, thirdCard: false, palaceCards: false },
+      cards: [], roomCards: Object.fromEntries(ROOMS.map((room) => [room.id, []])),
+      selectedRoom: 'clover-corner', unlockedRooms: ['clover-corner']
+    });
+    let state = freshState();
+    let callTimer = null;
+    let callGeneration = 0;
+    let showCallerRoomIcon = true;
+    let drawTimeout = null;
+    let callPauseTimeout = null;
+    let previewInterval = null;
+    let cardRefreshTimer = null;
+    let activeCelebrations = [];
+    let toastTimer = null;
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => [...document.querySelectorAll(selector)];
+    const cardsEl = $('#cards');
+
+    function makeCard(size = cardSize()) {
+      let numbers;
+      if (size !== 5) {
+        numbers = Array.from({ length: MAX_NUMBER }, (_, index) => index + 1);
+        for (let i = numbers.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+        }
+        numbers = numbers.slice(0, size * size);
+      } else {
+        const columns = CARD_RANGES.map(([min, max]) => randomColumn(min, max));
+        numbers = Array.from({ length: size * size }, (_, index) => columns[index % size][Math.floor(index / size)]);
+      }
+      const cells = numbers.map((number, index) => {
+        const isFree = size === 5 && index === 12;
+        return { number: isFree ? null : number, marked: isFree, wild: false, enchanted: false, enchantReward: 0 };
+      });
+      if (hasGlobalUpgrade('cloverFavor')) {
+        const eligibleCells = cells.map((cell, index) => cell.number === null ? -1 : index).filter((index) => index >= 0);
+        const favoredCell = eligibleCells[Math.floor(Math.random() * eligibleCells.length)];
+        cells[favoredCell].marked = true;
+      }
+      return { size, cells, calls: [], won: [] };
+    }
+
+    function randomColumn(min, max) {
+      const values = Array.from({ length: max - min + 1 }, (_, i) => min + i);
+      for (let i = values.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [values[i], values[j]] = [values[j], values[i]];
+      }
+      return values.slice(0, 5);
+    }
+
+    function cardSize(roomId = state.selectedRoom) {
+      if (roomId === 'clover-corner') return 3;
+      return roomId === 'lucky-clover-palace' && state.roomFeatures.palaceCards ? 7 : 5;
+    }
+
+    function cardLimit(roomId = state.selectedRoom) {
+      if (roomId === 'starlight-salon' && state.roomFeatures.secondCard) return 2;
+      if (roomId === 'grand-ballroom' && state.roomFeatures.thirdCard) return 3;
+      if (roomId === 'lucky-clover-palace' && state.roomFeatures.palaceCards) return 4;
+      return 1;
+    }
+
+    function ensureCards() {
+      const size = cardSize();
+      if (state.cards.some((card) => (card.size || Math.sqrt(card.cells.length)) !== size)) {
+        state.cards = [];
+      }
+      state.cards = state.cards.slice(0, cardLimit());
+      while (state.cards.length < cardLimit()) state.cards.push(makeCard(size));
+    }
+
+    function sanitizeCards(cards, legacyCalls = []) {
+      if (!Array.isArray(cards)) return [];
+      return cards.slice(0, 4).map((card) => {
+        const size = Number.isInteger(card.size) ? card.size : Math.sqrt(Array.isArray(card.cells) ? card.cells.length : 0);
+        const validShape = (size === 3 || size === 5 || size === 7) && Array.isArray(card.cells) && card.cells.length === size * size;
+        const validCells = validShape && card.cells.every((cell, index) => {
+          if (size === 5 && index === 12) return cell.number === null;
+          return Number.isInteger(cell.number) && cell.number >= 1 && cell.number <= MAX_NUMBER;
+        });
+        if (!validCells || (Array.isArray(card.won) && card.won.length)) return makeCard(5);
+        const calls = Array.isArray(card.calls)
+          ? [...new Set(card.calls.filter((number) => Number.isInteger(number) && number >= 1 && number <= MAX_NUMBER))].slice(0, MAX_NUMBER)
+          : legacyCalls;
+        return {
+          size,
+          calls,
+          cells: card.cells.map((cell, index) => ({
+            number: size === 5 && index === 12 ? null : cell.number,
+            marked: (size === 5 && index === 12) || cell.marked === true,
+            wild: cell.wild === true,
+            enchanted: cell.enchanted === true,
+            enchantReward: cell.enchanted && Number.isInteger(cell.enchantReward)
+              ? Math.min(15, Math.max(2, cell.enchantReward))
+              : 0
+          })),
+          won: []
+        };
+      });
+    }
+
+    function winningLines(size = 5) {
+      const lines = [];
+      for (let row = 0; row < size; row++) lines.push(Array.from({ length: size }, (_, col) => row * size + col));
+      for (let col = 0; col < size; col++) lines.push(Array.from({ length: size }, (_, row) => row * size + col));
+      lines.push(Array.from({ length: size }, (_, index) => index * size + index));
+      lines.push(Array.from({ length: size }, (_, index) => index * size + (size - index - 1)));
+      return lines;
+    }
+
+    function saveState() {
+      try {
+        state.roomCards[state.selectedRoom] = state.cards;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, running: false }));
+      } catch (error) {
+        showToast('Could not save progress in this browser.', true);
+      }
+    }
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
+        const parsed = JSON.parse(saved);
+        const hasRoomTickets = parsed && parsed.roomTickets && typeof parsed.roomTickets === 'object' && !Array.isArray(parsed.roomTickets);
+        if (!parsed || typeof parsed !== 'object' || !Number.isFinite(parsed.lifetime) || (!hasRoomTickets && !Number.isFinite(parsed.tickets))) return;
+        const clean = freshState();
+        clean.lifetime = Math.max(0, parsed.lifetime);
+        clean.lines = Number.isFinite(parsed.lines) ? Math.max(0, parsed.lines) : 0;
+        const legacyCalls = Array.isArray(parsed.calls)
+          ? [...new Set(parsed.calls.filter((n) => Number.isInteger(n) && n >= 1 && n <= MAX_NUMBER))].slice(0, MAX_NUMBER)
+          : [];
+        const hasRoomUpgrades = parsed.roomUpgrades && typeof parsed.roomUpgrades === 'object' && !Array.isArray(parsed.roomUpgrades);
+        if (hasRoomUpgrades) {
+          ROOMS.forEach((room) => {
+            const savedUpgrades = parsed.roomUpgrades[room.id];
+            if (!savedUpgrades || typeof savedUpgrades !== 'object' || Array.isArray(savedUpgrades)) return;
+            UPGRADES.forEach((upgrade) => {
+              const level = Number(savedUpgrades[upgrade.id]);
+              if (Number.isInteger(level)) {
+                clean.roomUpgrades[room.id][upgrade.id] = Math.min(upgrade.max, Math.max(0, level));
+              }
+            });
+          });
+        } else {
+          for (const upgrade of UPGRADES) {
+            const level = Number(parsed.upgrades && parsed.upgrades[upgrade.id]);
+            if (Number.isInteger(level)) {
+              clean.roomUpgrades[upgrade.roomId][upgrade.id] = Math.min(upgrade.max, Math.max(0, level));
+            }
+          }
+        }
+        clean.roomFeatures = {
+          secondCard: parsed.roomFeatures?.secondCard === true,
+          thirdCard: parsed.roomFeatures?.thirdCard === true,
+          palaceCards: parsed.roomFeatures?.palaceCards === true
+        };
+        const hasRoomProgress = parsed.roomProgress && typeof parsed.roomProgress === 'object' && !Array.isArray(parsed.roomProgress);
+        if (hasRoomProgress) {
+          ROOMS.forEach((room) => {
+            const progress = parsed.roomProgress[room.id];
+            if (!progress || typeof progress !== 'object' || Array.isArray(progress)) return;
+            clean.roomProgress[room.id] = {
+              tickets: Number.isFinite(progress.tickets) ? Math.max(0, progress.tickets) : 0,
+              bingos: Number.isFinite(progress.bingos) ? Math.max(0, progress.bingos) : 0
+            };
+          });
+        }
+        if (parsed.roomCards && typeof parsed.roomCards === 'object' && !Array.isArray(parsed.roomCards)) {
+          ROOMS.forEach((room) => {
+            clean.roomCards[room.id] = sanitizeCards(parsed.roomCards[room.id]);
+          });
+        }
+        const legacySelectedRoom = ROOMS.some((room) => room.id === parsed.selectedRoom) ? parsed.selectedRoom : 'clover-corner';
+        if (!parsed.roomCards || typeof parsed.roomCards !== 'object' || Array.isArray(parsed.roomCards)) {
+          clean.roomCards[legacySelectedRoom] = sanitizeCards(parsed.cards, legacyCalls);
+        }
+        clean.unlockedRooms = ['clover-corner'];
+        ROOMS.slice(1).filter((room) => roomUnlocked(room, clean)).forEach((room) => {
+          clean.unlockedRooms.push(room.id);
+        });
+        clean.selectedRoom = clean.unlockedRooms.includes(legacySelectedRoom)
+          ? legacySelectedRoom
+          : 'clover-corner';
+        if (hasRoomTickets) {
+          ROOMS.forEach((room) => {
+            const balance = parsed.roomTickets[room.id];
+            clean.roomTickets[room.id] = Number.isFinite(balance) ? Math.max(0, balance) : 0;
+          });
+        } else {
+          clean.roomTickets[clean.selectedRoom] = Math.max(0, parsed.tickets);
+        }
+        clean.lifetime = Math.max(clean.lifetime, Object.values(clean.roomTickets).reduce((total, balance) => total + balance, 0));
+        if (!hasRoomProgress) {
+          clean.roomProgress[clean.selectedRoom] = {
+            tickets: clean.lifetime,
+            bingos: clean.lines
+          };
+        }
+        clean.cards = clean.roomCards[clean.selectedRoom];
+        state = clean;
+      } catch (error) {
+        showToast('Saved progress could not be read; starting a fresh hall.', true);
+      }
+    }
+
+    function showToast(message, isError = false) {
+      const toast = $('#toast');
+      toast.textContent = message;
+      toast.classList.toggle('error', isError);
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+
+    function award(amount, roomId = state.selectedRoom) {
+      const wasGilded = state.roomProgress[roomId].tickets >= 1000;
+      state.roomTickets[roomId] += amount;
+      state.lifetime += amount;
+      state.roomProgress[roomId].tickets += amount;
+      if (!wasGilded && state.roomProgress[roomId].tickets >= 1000) {
+        showToast(`${ROOMS.find((entry) => entry.id === roomId).name} is now gilded!`);
+      }
+    }
+
+    function ticketBalance(roomId = state.selectedRoom) {
+      return state.roomTickets[roomId] || 0;
+    }
+
+    function ticketLabel(room = ROOMS.find((entry) => entry.id === state.selectedRoom) || ROOMS[0]) {
+      return `${room.ticketName} Tickets`;
+    }
+
+    function ticketIcon(room = ROOMS.find((entry) => entry.id === state.selectedRoom) || ROOMS[0]) {
+      return `<span class="ticket-icon" aria-hidden="true"><span>${room.icon}</span></span>`;
+    }
+
+    function renderCards(celebratingCards = activeCelebrations, enteringCards = []) {
+      ensureCards();
+      cardsEl.style.setProperty('--card-count', state.cards.length);
+      cardsEl.style.setProperty('--card-columns', Math.min(2, state.cards.length));
+      cardsEl.dataset.count = state.cards.length;
+      cardsEl.closest('.card-wrap').classList.toggle('has-four-cards', state.cards.length === 4);
+      cardsEl.closest('.game-panel').classList.toggle('has-four-cards', state.cards.length === 4);
+      cardsEl.replaceChildren();
+      state.cards.forEach((card, cardIndex) => {
+        const celebration = celebratingCards.find((item) => item.cardIndex === cardIndex);
+        const displayCard = celebration ? celebration.card : card;
+        const board = document.createElement('div');
+        board.className = 'bingo-card';
+        const size = displayCard.size || Math.sqrt(displayCard.cells.length);
+        board.dataset.size = size;
+        board.style.setProperty('--grid-size', size);
+        board.setAttribute('role', 'grid');
+        board.setAttribute('aria-label', `Bingo card ${cardIndex + 1}`);
+        displayCard.cells.forEach((cell, cellIndex) => {
+          const isWinningCell = celebration && celebration.lines.some((line) => line.includes(cellIndex));
+          const button = document.createElement('div');
+          button.className = `cell${cell.marked ? ' marked' : ''}${cell.number === null ? ' free' : ''}${cell.wild ? ' wild-mark' : ''}${cell.enchanted ? ' enchanted' : ''}${isWinningCell ? ' winning-line' : ''}`;
+          button.setAttribute('role', 'gridcell');
+          button.setAttribute('aria-label', `${cell.number === null ? 'Free space' : `Number ${cell.number}${cell.marked ? ', marked' : ''}${cell.enchanted ? `, enchanted for ${cell.enchantReward || enchantmentReward(upgradeLevel('wild'))} bonus ${ticketLabel().toLowerCase()}` : ''}`}${isWinningCell ? ', part of completed bingo line' : ''}`);
+          button.textContent = cell.number === null ? 'FREE' : String(cell.number);
+          board.append(button);
+        });
+        if (celebration && celebration.multiplier > 1) {
+          const splash = document.createElement('div');
+          splash.className = 'bingo-multiplier-splash';
+          splash.setAttribute('aria-hidden', 'true');
+          const value = document.createElement('span');
+          value.className = 'bingo-multiplier-value';
+          value.textContent = `${celebration.multiplier}X`;
+          const upperIcon = document.createElement('span');
+          upperIcon.className = 'bingo-multiplier-icon';
+          upperIcon.textContent = celebration.roomIcon;
+          const lowerIcon = upperIcon.cloneNode(true);
+          value.append(upperIcon, lowerIcon);
+          splash.append(value);
+          board.append(splash);
+        }
+        const wrapper = document.createElement('div');
+        wrapper.className = 'card-slot';
+        if (celebration) wrapper.classList.add('card-winner');
+        if (enteringCards.includes(cardIndex)) wrapper.classList.add('card-enter');
+        const labelGroup = document.createElement('div');
+        labelGroup.className = 'bingo-label-group';
+        labelGroup.style.setProperty('--grid-size', size);
+        const labels = size === 7
+          ? ['B', 'I', 'N', 'G', 'O', 'E', 'S']
+          : size === 5
+            ? ['B', 'I', 'N', 'G', 'O']
+            : Array.from({ length: size }, (_, index) => String(index + 1));
+        for (const letter of labels) {
+          const label = document.createElement('span');
+          label.textContent = letter;
+          labelGroup.append(label);
+        }
+        wrapper.append(labelGroup, board);
+        if (celebration) {
+          const burst = document.createElement('div');
+          burst.className = 'confetti-burst';
+          burst.setAttribute('aria-hidden', 'true');
+          const colors = ['#f2d47e', '#caaa57', '#f4eee0', '#9e3b47', '#78a77b'];
+          for (let index = 0; index < 24; index++) {
+            const piece = document.createElement('span');
+            const angle = (Math.PI * 2 * index) / 24 + Math.random() * .25;
+            const distance = 45 + Math.random() * 105;
+            piece.className = 'confetti-piece';
+            piece.style.setProperty('--confetti-color', colors[index % colors.length]);
+            piece.style.setProperty('--confetti-x', `${Math.cos(angle) * distance}px`);
+            piece.style.setProperty('--confetti-y', `${Math.sin(angle) * distance}px`);
+            piece.style.setProperty('--confetti-rotation', `${Math.floor(Math.random() * 540) - 270}deg`);
+            piece.style.setProperty('--confetti-delay', `${Math.random() * 90}ms`);
+            burst.append(piece);
+          }
+          wrapper.append(burst);
+        }
+        cardsEl.append(wrapper);
+      });
+    }
+
+    function renderHistory() {
+      const history = $('#history');
+      history.replaceChildren();
+      const recentCallLimit = state.selectedRoom === 'starlight-salon'
+        ? 15
+        : ['grand-ballroom', 'lucky-clover-palace'].includes(state.selectedRoom)
+          ? 10
+        : state.cards.length > 1 ? 5 : 50;
+      state.cards.forEach((card, cardIndex) => {
+        const group = document.createElement('div');
+        group.className = 'history-group';
+        const label = document.createElement('div');
+        label.className = 'micro-label';
+        label.textContent = `Card ${cardIndex + 1} · ${card.calls.length}/99`;
+        const calls = document.createElement('div');
+        calls.className = 'history';
+        card.calls.slice(-recentCallLimit).reverse().forEach((number) => {
+          const chip = document.createElement('span');
+          chip.className = 'history-chip';
+          if (card.cells.some((cell) => cell.number === number && cell.marked)) {
+            chip.classList.add('is-on-card');
+          }
+          if (card.cells.some((cell) => cell.number === number && cell.enchanted)) {
+            chip.classList.add('is-enchanted');
+          }
+          chip.textContent = number;
+          calls.append(chip);
+        });
+        group.append(label, calls);
+        history.append(group);
+      });
+      const firstCard = state.cards[0];
+      const callerCount = 1 + upgradeLevel('multi') + Number(hasGlobalUpgrade('doubleDraw'));
+      const latestCalls = firstCard ? firstCard.calls.slice(-callerCount) : [];
+      $('#latest-number-label').textContent = `Latest · Card 1${callerCount > 1 ? ` · ${callerCount} calls` : ''}`;
+      if (drawTimeout) return;
+      $$('.roller-stage .called-ball').forEach((ball, index) => {
+        const number = latestCalls[latestCalls.length - index - 1];
+        ball.classList.remove('preview', 'reveal');
+        const room = ROOMS.find((entry) => entry.id === state.selectedRoom) || ROOMS[0];
+        ball.textContent = showCallerRoomIcon || !number ? room.icon : numberLabel(number);
+        ball.setAttribute('aria-label', showCallerRoomIcon || !number
+          ? `${room.name} room icon`
+          : `Latest number ${numberLabel(number)} for card 1`);
+      });
+    }
+
+    function numberLabel(number, roomId = state.selectedRoom) {
+      if (roomId === 'clover-corner') {
+        return `${Math.ceil(number / 33)}-${number}`;
+      }
+      const letter = number <= 19 ? 'B' : number <= 39 ? 'I' : number <= 59 ? 'N' : number <= 79 ? 'G' : 'O';
+      return `${letter}-${number}`;
+    }
+
+    function upgradeCost(upgrade) {
+      return upgrade.baseCost * (upgradeLevel(upgrade.id) + 1);
+    }
+
+    function upgradeLevel(id, roomId = state.selectedRoom) {
+      return state.roomUpgrades[roomId]?.[id] || 0;
+    }
+
+    function enchantmentChance(level) {
+      return Math.min(50, level * 5);
+    }
+
+    function enchantmentReward(level) {
+      return Math.min(10, level + 1);
+    }
+
+    function cardCallChance(level) {
+      return Math.min(75, level * 15);
+    }
+
+    function hasGlobalUpgrade(id) {
+      const upgrade = GLOBAL_UPGRADES.find((entry) => entry.id === id);
+      return Boolean(upgrade && state.roomProgress[upgrade.roomId].bingos >= upgrade.bingos);
+    }
+
+    function roomMultiplier(roomId = state.selectedRoom) {
+      return (ROOMS.findIndex((room) => room.id === roomId) + 1) * 10;
+    }
+
+    function lineTicketReward(roomId = state.selectedRoom, size = cardSize(roomId)) {
+      const baseReward = size === 7 ? 20 : 5;
+      return (baseReward + upgradeLevel('bonus', roomId) * 2 + Number(hasGlobalUpgrade('ticketBonus')))
+        * roomMultiplier(roomId);
+    }
+
+    function renderGlobalUpgrades() {
+      const list = $('#global-upgrade-list');
+      list.replaceChildren();
+      GLOBAL_UPGRADES.forEach((upgrade) => {
+        const unlocked = hasGlobalUpgrade(upgrade.id);
+        const room = ROOMS.find((entry) => entry.id === upgrade.roomId);
+        const roomBingos = state.roomProgress[upgrade.roomId].bingos;
+        const item = document.createElement('div');
+        item.className = `global-upgrade${unlocked ? ' is-unlocked' : ''}`;
+        const status = unlocked ? 'Unlocked' : `${formatNumber(roomBingos)} / ${upgrade.bingos} bingos`;
+        item.innerHTML = `<div class="global-upgrade-top"><span>${upgrade.name}</span><span class="global-upgrade-status">${status}</span></div><p class="global-upgrade-desc">${upgrade.description} Earned in ${room.name}.</p>`;
+        list.append(item);
+      });
+    }
+
+    function renderUpgrades() {
+      const list = $('#upgrade-list');
+      list.replaceChildren();
+      const room = ROOMS.find((entry) => entry.id === state.selectedRoom) || ROOMS[0];
+      const roomIndex = ROOMS.findIndex((entry) => entry.id === room.id);
+      const upgrades = UPGRADES.filter((upgrade) => ROOMS.findIndex((entry) => entry.id === upgrade.roomId) <= roomIndex)
+        .map((upgrade) => ({ ...upgrade, type: 'level' }));
+      const features = (ROOM_FEATURES[room.id] || []).map((feature) => ({ ...feature, type: 'feature' }));
+      $('#upgrade-heading').textContent = `${room.name} Upgrades`;
+      $('#upgrade-caption').textContent = 'Earlier Room Upgrades Are Available Here With Separate Levels.';
+      upgrades.concat(features).forEach((upgrade) => {
+        const level = upgrade.type === 'level' ? upgradeLevel(upgrade.id) : Number(state.roomFeatures[upgrade.id]);
+        const maxed = upgrade.type === 'level' ? level >= upgrade.max : level > 0;
+        const cost = upgrade.type === 'level' ? upgradeCost(upgrade) : upgrade.cost;
+        const description = upgrade.id === 'multi'
+          ? `Calls ${1 + level + Number(hasGlobalUpgrade('doubleDraw'))} numbers per card per draw.${level < upgrade.max ? ` Next level adds 1 more.` : ''}`
+          : upgrade.id === 'cardLuck'
+            ? `Current chance to draw a remaining card number: ${Math.min(75, cardCallChance(level) + Number(hasGlobalUpgrade('cardLuck')) * 10)}%.${level < upgrade.max ? ` Next level: ${Math.min(75, cardCallChance(level + 1) + Number(hasGlobalUpgrade('cardLuck')) * 10)}%.` : ''}`
+          : upgrade.id === 'wild'
+            ? level
+              ? `Each called square has a ${enchantmentChance(level)}% chance to earn +${enchantmentReward(level)} bonus tickets.${level < upgrade.max ? ` Next: ${enchantmentChance(level + 1)}% for +${enchantmentReward(level + 1)}.` : ''}`
+              : `Next level: each called square has a 5% chance to earn +2 bonus tickets.`
+          : upgrade.id === 'quick'
+            ? `Current draw time: ${(drawDuration() / 1000).toFixed(2)} sec.${level < upgrade.max ? ` Next: ${(Math.max(750, drawDuration() - 350) / 1000).toFixed(2)} sec.` : ''}`
+          : upgrade.id === 'bonus'
+            ? `Current bonus: +${level * 2 + Number(hasGlobalUpgrade('ticketBonus'))} base tickets per line, before the room multiplier.${level < upgrade.max ? ' Next level adds +2.' : ''}`
+            : upgrade.description;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `upgrade${maxed ? ' owned' : ''}`;
+        button.disabled = maxed || ticketBalance() < cost;
+        button.setAttribute('aria-label', `${upgrade.name}: ${description} ${maxed ? 'Owned' : `Costs ${cost} ${ticketLabel(room)}`}`);
+        button.innerHTML = `<span class="upgrade-icon" aria-hidden="true">${upgrade.icon}</span><span><span class="upgrade-name">${upgrade.name}${upgrade.type === 'level' && level && upgrade.max > 1 ? ` · Lv ${level}` : ''}</span><span class="upgrade-desc">${description}</span></span><span class="upgrade-cost">${maxed ? 'Owned' : `${ticketIcon(room)} ${cost}`}<small>${maxed ? '' : `${room.ticketName} Tickets`}</small></span>`;
+        button.addEventListener('click', () => buyUpgrade(upgrade.id));
+        list.append(button);
+      });
+    }
+
+    function roomUnlocked(room, roomState = state) {
+      if (!room.requirement) return true;
+      const roomIndex = ROOMS.findIndex((entry) => entry.id === room.id);
+      const previousRoom = ROOMS[roomIndex - 1];
+      if (!previousRoom) return true;
+      if (!roomUnlocked(previousRoom, roomState)) return false;
+      const previousProgress = roomState.roomProgress[previousRoom.id];
+      const progress = room.requirement.type === 'tickets' ? previousProgress.tickets : previousProgress.bingos;
+      return progress >= room.requirement.value;
+    }
+
+    function renderRooms() {
+      const roomList = $('#room-list');
+      roomList.replaceChildren();
+      state.unlockedRooms = ROOMS.filter((room) => roomUnlocked(room)).map((room) => room.id);
+      ROOMS.forEach((room) => {
+        const unlocked = roomUnlocked(room);
+        if (unlocked && !state.unlockedRooms.includes(room.id)) {
+          state.unlockedRooms.push(room.id);
+          showToast(`${room.name} Unlocked! You Can Visit It Anytime.`);
+        }
+        const selected = state.selectedRoom === room.id;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'room-option';
+        button.dataset.room = room.id;
+        button.disabled = !unlocked;
+        button.setAttribute('aria-pressed', String(selected));
+        button.setAttribute('aria-label', `${room.name}${selected ? ', current room' : ''}${unlocked ? ', unlocked' : `, locked: ${room.description}`}`);
+        button.title = unlocked ? room.description : `${room.name}: ${room.description}`;
+        const status = selected ? "You're Here" : unlocked ? 'Unlocked' : room.description;
+        button.innerHTML = `<span class="room-option-icon" aria-hidden="true">${room.icon}</span><span><span class="room-option-name">${room.name}</span><span class="room-option-status">${status}</span></span>`;
+        button.addEventListener('click', () => {
+          if (!state.unlockedRooms.includes(room.id) && !roomUnlocked(room)) return;
+          if (!state.unlockedRooms.includes(room.id)) state.unlockedRooms.push(room.id);
+          stopCalling();
+          clearTimeout(cardRefreshTimer);
+          cardRefreshTimer = null;
+          activeCelebrations = [];
+          state.roomCards[state.selectedRoom] = state.cards;
+          state.selectedRoom = room.id;
+          state.cards = state.roomCards[room.id] || [];
+          ensureCards();
+          render();
+          showToast(`Welcome To ${room.name}!`);
+        });
+        roomList.append(button);
+      });
+
+      const currentRoom = ROOMS.find((room) => room.id === state.selectedRoom) || ROOMS[0];
+      document.body.dataset.room = currentRoom.id;
+      const gilded = state.roomProgress[currentRoom.id].tickets >= 1000;
+      document.body.classList.toggle('is-gilded', gilded);
+      $('#current-room').textContent = currentRoom.name;
+      $('#room-scene-icon').textContent = currentRoom.icon;
+      $('#room-scene-name').textContent = currentRoom.name;
+      $('#room-scene-mood').textContent = `${currentRoom.description}${gilded ? ' · Gilded Hall' : ''}`;
+
+      const nextRoom = ROOMS.find((room) => !state.unlockedRooms.includes(room.id));
+      const progressCopy = $('#room-progress');
+      const progressFill = $('#room-progress-fill');
+      if (!nextRoom) {
+        progressCopy.textContent = 'All Six Rooms Are Open. Pick Your Favorite And Settle In.';
+        progressFill.style.width = '100%';
+        return;
+      }
+      const requirement = nextRoom.requirement;
+      const previousRoom = ROOMS[ROOMS.findIndex((room) => room.id === nextRoom.id) - 1];
+      const previousProgress = state.roomProgress[previousRoom.id];
+      const current = requirement.type === 'tickets' ? previousProgress.tickets : previousProgress.bingos;
+      const unit = requirement.type === 'tickets' ? 'Tickets' : 'Bingos';
+      const progress = Math.min(100, (current / requirement.value) * 100);
+      progressCopy.textContent = `Next Unlock: ${nextRoom.name} · ${Math.min(current, requirement.value)} / ${requirement.value} ${unit} in ${previousRoom.name}`;
+      progressFill.style.width = `${progress}%`;
+    }
+
+    function render(celebratingCards = activeCelebrations, enteringCards = []) {
+      renderCards(celebratingCards, enteringCards);
+      renderHistory();
+      renderUpgrades();
+      renderGlobalUpgrades();
+      renderRooms();
+      renderCallers();
+      const rollers = $$('.roller-stage');
+      const running = Boolean(callTimer);
+      const drawing = Boolean(drawTimeout);
+      rollers.forEach((roller) => {
+        roller.classList.toggle('is-rolling', drawing);
+        roller.style.setProperty('--roller-speed', `${rollerSpinDuration()}ms`);
+      });
+      const linePayout = lineTicketReward();
+      for (const payout of ['#row-payout', '#column-payout', '#diagonal-payout']) {
+        $(payout).innerHTML = `${linePayout} ${ticketIcon()} ${ticketLabel()} · ${roomMultiplier()}×`;
+      }
+      $('#ticket-label').innerHTML = `${ticketIcon()} ${ticketLabel()}`;
+      $('#ticket-count').textContent = formatNumber(ticketBalance());
+      $('#lifetime-count').textContent = formatNumber(state.lifetime);
+      const currentRoom = ROOMS.find((room) => room.id === state.selectedRoom) || ROOMS[0];
+      $('#room-lifetime-label').textContent = `${currentRoom.ticketName} Lifetime Tickets`;
+      $('#room-lifetime-count').textContent = formatNumber(state.roomProgress[state.selectedRoom].tickets);
+      $('#lines-count').textContent = formatNumber(state.roomProgress[state.selectedRoom].bingos);
+      $('#game-status').classList.toggle('is-running', running || drawing);
+      $('#status-text').textContent = running
+        ? 'Calling numbers' : drawing ? 'Drawing a number' : 'Ready when you are';
+      const autoCalling = hasGlobalUpgrade('autoCaller');
+      $('#toggle-button').innerHTML = running
+        ? 'Pause a moment <span aria-hidden="true">Ⅱ</span>'
+        : drawing ? 'Drawing number…' : autoCalling ? 'Start calling <span aria-hidden="true"> →</span>' : 'Call Number <span aria-hidden="true"> →</span>';
+      $('#toggle-button').disabled = drawing && !running;
+      $('#game-hint').textContent = running
+        ? 'Each Card Gets Its Own Calls. The Hall Moves Forward.'
+        : drawing ? 'The ball is rolling. Your number is on its way.'
+        : autoCalling ? 'Automatic calling is ready in every room.' : 'Each active card has its own number stream.';
+      saveState();
+    }
+
+    function renderCallers() {
+      const callerCount = 1 + upgradeLevel('multi') + Number(hasGlobalUpgrade('doubleDraw'));
+      const group = $('#roller-group');
+      const area = $('#caller-area').parentElement;
+      area.classList.toggle('has-multiple-callers', callerCount > 1);
+      $('#caller-area').classList.toggle('has-five-callers', callerCount === 5);
+      group.classList.toggle('has-five-callers', callerCount === 5);
+      group.style.setProperty('--caller-count', callerCount);
+      while (group.children.length > callerCount) group.lastElementChild.remove();
+      while (group.children.length < callerCount) {
+        const index = group.children.length;
+        const machine = document.createElement('div');
+        machine.className = 'caller-machine';
+        const stage = document.createElement('div');
+        stage.className = 'roller-stage';
+        stage.setAttribute('role', 'group');
+        stage.setAttribute('aria-label', `Bingo caller ${index + 1}`);
+        const cage = document.createElement('div');
+        cage.className = 'roller-cage';
+        cage.setAttribute('aria-hidden', 'true');
+        const ball = document.createElement('div');
+        ball.className = 'called-ball';
+        ball.setAttribute('role', 'img');
+        ball.setAttribute('aria-label', 'No number called yet');
+        ball.textContent = '♣';
+        const label = document.createElement('span');
+        label.className = 'caller-label';
+        label.textContent = `Caller ${index + 1}`;
+        stage.append(cage, ball);
+        machine.append(stage, label);
+        group.append(machine);
+      }
+    }
+
+    function completePatterns(card) {
+      const size = card.size || Math.sqrt(card.cells.length);
+      return winningLines(size)
+        .map((line, lineIndex) => line.every((cellIndex) => card.cells[cellIndex].marked) ? lineIndex : -1)
+        .filter((lineIndex) => lineIndex >= 0);
+    }
+
+    function scoreCompletedBingos(roomId, cards) {
+      const celebrations = [];
+      const room = ROOMS.find((entry) => entry.id === roomId) || ROOMS[0];
+      const roomProgress = state.roomProgress[roomId];
+      const previousRoomBingos = roomProgress.bingos;
+      const completedCards = cards.map((card) => completePatterns(card));
+      const bingoCount = completedCards.reduce((total, lines) => total + lines.length, 0);
+      const multiplier = Math.max(1, bingoCount);
+      let totalReward = 0;
+      completedCards.forEach((lineIndices, cardIndex) => {
+        const card = cards[cardIndex];
+        if (!lineIndices.length) return;
+        const cardReward = lineTicketReward(roomId, card.size || Math.sqrt(card.cells.length)) * lineIndices.length * multiplier;
+        totalReward += cardReward;
+        award(cardReward, roomId);
+        state.lines += lineIndices.length;
+        roomProgress.bingos += lineIndices.length;
+        celebrations.push({
+          cardIndex,
+          multiplier,
+          roomIcon: room.icon,
+          card: { size: card.size, cells: card.cells.map((cell) => ({ ...cell })) },
+          lines: lineIndices.map((lineIndex) => winningLines(card.size || Math.sqrt(card.cells.length))[lineIndex])
+        });
+        cards[cardIndex] = makeCard(card.size || Math.sqrt(card.cells.length));
+      });
+      if (bingoCount) {
+        showToast(`${bingoCount} ${bingoCount === 1 ? 'bingo' : 'bingos'}! ${multiplier}X multiplier · +${totalReward} ${ticketLabel(room).toLowerCase()}. Fresh card, fresh chance!`);
+      }
+      const unlockedUpgrades = GLOBAL_UPGRADES.filter((upgrade) =>
+        upgrade.roomId === roomId
+        && previousRoomBingos < upgrade.bingos
+        && roomProgress.bingos >= upgrade.bingos
+      );
+      if (unlockedUpgrades.length) {
+        showToast(`Hall-wide reward unlocked: ${unlockedUpgrades.map((upgrade) => upgrade.name).join(', ')}!`);
+      }
+      return celebrations;
+    }
+
+    function showBingoCelebrations(celebrations) {
+      activeCelebrations = celebrations;
+      render();
+      $$('.roller-stage .called-ball').forEach((ball) => {
+        void ball.offsetWidth;
+        ball.classList.add('reveal');
+      });
+      if (!celebrations.length) return;
+      cardRefreshTimer = setTimeout(() => {
+        const enteringCards = activeCelebrations.map(({ cardIndex }) => cardIndex);
+        activeCelebrations = [];
+        cardRefreshTimer = null;
+        render([], enteringCards);
+      }, 580);
+    }
+
+    function chooseCalledNumber(remaining, card) {
+      const chance = Math.min(75, cardCallChance(upgradeLevel('cardLuck')) + (hasGlobalUpgrade('cardLuck') ? 10 : 0)) / 100;
+      if (!chance) return remaining[Math.floor(Math.random() * remaining.length)];
+      const cardNumbers = new Set(card.cells
+        .map((cell) => cell.number)
+        .filter((number) => number !== null && remaining.includes(number)));
+      const onCard = remaining.filter((number) => cardNumbers.has(number));
+      if (!onCard.length) return remaining[Math.floor(Math.random() * remaining.length)];
+      const offCard = remaining.filter((number) => !cardNumbers.has(number));
+      const preferCard = !offCard.length || Math.random() < chance;
+      const pool = preferCard ? onCard : offCard;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    function callNumber() {
+      if (cardRefreshTimer) return;
+      const roomId = state.selectedRoom;
+      showCallerRoomIcon = false;
+      if (state.cards.every((card) => card.calls.length >= MAX_NUMBER)) {
+        state.cards = state.cards.map((card) => makeCard(card.size));
+        showToast('A fresh round! Every card gets a new chance.');
+      }
+      state.cards = state.cards.map((card) => card.calls.length >= MAX_NUMBER ? makeCard(card.size) : card);
+      state.cards.forEach((card) => {
+        const callCount = Math.min(1 + upgradeLevel('multi') + Number(hasGlobalUpgrade('doubleDraw')), MAX_NUMBER - card.calls.length);
+        for (let callIndex = 0; callIndex < callCount; callIndex++) {
+          const remaining = Array.from({ length: MAX_NUMBER }, (_, index) => index + 1).filter((number) => !card.calls.includes(number));
+          const number = chooseCalledNumber(remaining, card);
+          card.calls.push(number);
+          const cell = card.cells.find((entry) => entry.number === number);
+          if (cell) {
+            cell.marked = true;
+            const enchantLevel = upgradeLevel('wild');
+            if (enchantLevel && !cell.enchanted && Math.random() < enchantmentChance(enchantLevel) / 100) {
+              const reward = enchantmentReward(enchantLevel);
+              cell.enchanted = true;
+              cell.enchantReward = reward;
+              award(reward);
+            }
+          }
+        }
+      });
+      const balls = $$('.roller-stage .called-ball');
+      clearInterval(previewInterval);
+      previewInterval = null;
+      balls.forEach((ball) => ball.classList.remove('preview', 'reveal'));
+      state.roomCards[roomId] = state.cards;
+      const celebrations = scoreCompletedBingos(roomId, state.cards);
+      showBingoCelebrations(celebrations);
+    }
+
+    function rollerSpinDuration() {
+      return Math.max(500, 1100 - upgradeLevel('quick') * 120);
+    }
+
+    function drawDuration() {
+      return Math.max(750, BASE_DRAW_DURATION - upgradeLevel('quick') * 350 - (hasGlobalUpgrade('quickCaller') ? 250 : 0));
+    }
+
+    function previewNumberDuration() {
+      return Math.max(160, 550 - upgradeLevel('quick') * 78);
+    }
+
+    function scheduleCall(generation = callGeneration) {
+      if (generation !== callGeneration || drawTimeout || callPauseTimeout || cardRefreshTimer) return;
+      updateRollPreview();
+      previewInterval = setInterval(() => updateRollPreview(generation), previewNumberDuration());
+      drawTimeout = setTimeout(() => {
+        if (generation !== callGeneration) return;
+        drawTimeout = null;
+        callNumber();
+        if (callTimer) {
+          callPauseTimeout = setTimeout(() => {
+            callPauseTimeout = null;
+            scheduleCall(generation);
+          }, AUTO_CALL_PAUSE);
+        }
+      }, drawDuration());
+      render();
+    }
+
+    function updateRollPreview(generation = callGeneration) {
+      if (generation !== callGeneration) return;
+      showCallerRoomIcon = false;
+      const calledNumbers = new Set(state.cards[0]?.calls || []);
+      const balls = $$('.roller-stage .called-ball');
+      balls.forEach((ball) => {
+        const remaining = Array.from({ length: MAX_NUMBER }, (_, index) => index + 1)
+          .filter((number) => !calledNumbers.has(number));
+        if (!remaining.length) return;
+        const number = remaining[Math.floor(Math.random() * remaining.length)];
+        calledNumbers.add(number);
+        ball.textContent = numberLabel(number);
+        ball.setAttribute('aria-label', `Rolling number ${numberLabel(number)}`);
+        ball.classList.remove('reveal');
+        ball.classList.add('preview');
+      });
+    }
+
+    function setRunning(shouldRun) {
+      if (shouldRun) {
+        const autoCalling = hasGlobalUpgrade('autoCaller');
+        if (!autoCalling) {
+          scheduleCall();
+          return;
+        }
+        if (callTimer) return;
+        const generation = callGeneration;
+        callTimer = setInterval(() => scheduleCall(generation), drawDuration());
+        scheduleCall(generation);
+      } else {
+        stopCalling();
+        render();
+      }
+    }
+
+    function stopCalling() {
+      callGeneration++;
+      showCallerRoomIcon = true;
+      clearInterval(callTimer);
+      callTimer = null;
+      clearTimeout(drawTimeout);
+      drawTimeout = null;
+      clearTimeout(callPauseTimeout);
+      callPauseTimeout = null;
+      clearInterval(previewInterval);
+      previewInterval = null;
+    }
+
+    function buyUpgrade(id) {
+      const upgrade = UPGRADES.find((item) => item.id === id);
+      const feature = (ROOM_FEATURES[state.selectedRoom] || []).find((item) => item.id === id);
+      const roomIndex = ROOMS.findIndex((room) => room.id === state.selectedRoom);
+      if ((!upgrade || ROOMS.findIndex((room) => room.id === upgrade.roomId) > roomIndex) && !feature) return;
+      const level = upgrade ? upgradeLevel(id) : Number(state.roomFeatures[id]);
+      const cost = upgrade ? upgradeCost(upgrade) : feature.cost;
+      if ((upgrade ? level >= upgrade.max : level > 0) || ticketBalance() < cost) return;
+      state.roomTickets[state.selectedRoom] -= cost;
+      if (upgrade) state.roomUpgrades[state.selectedRoom][id] = level + 1;
+      else state.roomFeatures[id] = true;
+      ensureCards();
+      if (callTimer && upgrade && id === 'quick') {
+        clearInterval(callTimer);
+        callTimer = setInterval(scheduleCall, drawDuration());
+      }
+      showToast(`${(upgrade || feature).name} purchased for ${ticketLabel().toLowerCase()}!`);
+      render();
+    }
+
+    function formatNumber(number) {
+      return Math.floor(number).toLocaleString();
+    }
+
+    loadState();
+    ensureCards();
+    render();
+    $('#start-game').addEventListener('click', () => {
+      $('#main-menu').hidden = true;
+      $('#game').inert = false;
+      $('main h1').focus();
+    });
+    $('#help-button').addEventListener('click', () => $('#bingo-help').showModal());
+    $('#toggle-button').addEventListener('click', () => setRunning(!callTimer));
+    window.addEventListener('pagehide', () => {
+      stopCalling();
+      clearTimeout(cardRefreshTimer);
+      cardRefreshTimer = null;
+      saveState();
+    });
+  </script>
+</body>
+</html>
